@@ -1,0 +1,106 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://Script/LG401_module.gd" type="Script" id=1]
+[ext_resource path="res://Script/Interpreter_LG401.gd" type="Script" id=2]
+[ext_resource path="res://ObjectTile/LG401_module_RIGHT.png" type="Texture" id=3]
+[ext_resource path="res://ObjectTile/LG401_module_LEFT.png" type="Texture" id=4]
+[ext_resource path="res://ObjectTile/LG401_module_DOWN.png" type="Texture" id=5]
+[ext_resource path="res://ObjectTile/LG401_module_UP.png" type="Texture" id=6]
+
+[sub_resource type="SpriteFrames" id=1]
+
+animations = [ {
+"frames": [ ExtResource( 3 ) ],
+"loop": true,
+"name": "EAST",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 4 ) ],
+"loop": true,
+"name": "WEST",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 5 ) ],
+"loop": true,
+"name": "SOUTH",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 6 ) ],
+"loop": true,
+"name": "NORTH",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=2]
+
+custom_solver_bias = 0.0
+extents = Vector2( 10, 10 )
+
+[node name="LG401_module" type="KinematicBody2D"]
+
+position = Vector2( 16, 16 )
+input_pickable = false
+collision_layer = 1
+collision_mask = 1
+collision/safe_margin = 0.08
+script = ExtResource( 1 )
+_sections_unfolded = [ "Transform" ]
+
+[node name="LG401_Interpreter" type="Node" parent="." index="0"]
+
+script = ExtResource( 2 )
+
+[node name="Clock_bar" type="ProgressBar" parent="." index="1"]
+
+visible = false
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = -49.0
+margin_top = -40.0
+margin_right = 50.0
+margin_bottom = -24.0
+rect_pivot_offset = Vector2( 0, 0 )
+rect_clip_content = false
+mouse_filter = 0
+mouse_default_cursor_shape = 0
+size_flags_horizontal = 1
+size_flags_vertical = 0
+min_value = 0.0
+max_value = 100.0
+step = 1.0
+page = 0.0
+value = 0.0
+exp_edit = false
+rounded = false
+percent_visible = true
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="." index="2"]
+
+frames = SubResource( 1 )
+animation = "NORTH"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." index="3"]
+
+shape = SubResource( 2 )
+
+[node name="Movement" type="Tween" parent="." index="4"]
+
+repeat = false
+playback_process_mode = 1
+playback_speed = 1.0
+playback/active = false
+playback/repeat = false
+playback/speed = 1.0
+_sections_unfolded = [ "playback" ]
+
+[node name="Collision_checker" type="RayCast2D" parent="." index="5"]
+
+enabled = true
+exclude_parent = true
+cast_to = Vector2( 0, 50 )
+collision_mask = 1
+_sections_unfolded = [ "Transform" ]
+
+
