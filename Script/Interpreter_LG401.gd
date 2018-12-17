@@ -24,64 +24,67 @@ func evaluate():
 	
 	self.instruction = self.current_token
 	
-	match(instruction.type):
-	
-		LG401_type.PLUS:
+	if(instruction != null):
+		match(instruction.type):
 			
-			eat(LG401_type.PLUS)
-			
-			inst_2V_1R()
-			
-			if(!self.error_occur):
-				var temp = 0
+			LG401_type.PLUS:
 				
-				if(self.operand_1.type == BASE_type.REGISTER):
-					temp = self.registers[self.operand_1.value]
-				else:
-					temp = self.operand_1.value
+				eat(LG401_type.PLUS)
+				
+				inst_2V_1R()
+				
+				if(!self.error_occur):
+					var temp = 0
 					
-				if(self.operand_2.type == BASE_type.REGISTER):
-					temp += self.registers[self.operand_2.value]
-				else:
-					temp += self.operand_2.value
-				
-				self.registers[self.operand_3.value] = temp
-				emit_signal("add_signal")
-			
-		LG401_type.MINUS:
-			
-			eat(LG401_type.MINUS)
-			
-			inst_2V_1R()
-			
-			if(!self.error_occur):
-				var temp = 0
-				
-				if(self.operand_1.type == BASE_type.REGISTER):
-					temp = self.registers[self.operand_1.value]
-				else:
-					temp = self.operand_1.value
+					if(self.operand_1.type == BASE_type.REGISTER):
+						temp = self.registers[self.operand_1.value]
+					else:
+						temp = self.operand_1.value
+						
+					if(self.operand_2.type == BASE_type.REGISTER):
+						temp += self.registers[self.operand_2.value]
+					else:
+						temp += self.operand_2.value
 					
-				if(self.operand_2.type == BASE_type.REGISTER):
-					temp -= self.registers[self.operand_2.value]
-				else:
-					temp -= self.operand_2.value
+					self.registers[self.operand_3.value] = temp
+					emit_signal("add_signal")
 				
-				self.registers[self.operand_3.value] = temp
-				emit_signal("sub_signal")
-			
-		LG401_type.WALK:
-			
-			eat(LG401_type.WALK)
-			
-			self.operand_1 = self.current_token
-			eat(LG401_type.DIRECTION)
-			
-			self.operand_2 = self.current_token
-			eat(BASE_type.INTEGER)
-			
-			if(!self.error_occur):
-				emit_signal("walk_signal",operand_1.value,operand_2.value)
+			LG401_type.MINUS:
+				
+				eat(LG401_type.MINUS)
+				
+				inst_2V_1R()
+				
+				if(!self.error_occur):
+					var temp = 0
+					
+					if(self.operand_1.type == BASE_type.REGISTER):
+						temp = self.registers[self.operand_1.value]
+					else:
+						temp = self.operand_1.value
+						
+					if(self.operand_2.type == BASE_type.REGISTER):
+						temp -= self.registers[self.operand_2.value]
+					else:
+						temp -= self.operand_2.value
+					
+					self.registers[self.operand_3.value] = temp
+					emit_signal("sub_signal")
+				
+			LG401_type.WALK:
+				
+				eat(LG401_type.WALK)
+				
+				self.operand_1 = self.current_token
+				eat(LG401_type.DIRECTION)
+				
+				self.operand_2 = self.current_token
+				eat(BASE_type.INTEGER)
+				
+				if(!self.error_occur):
+					emit_signal("walk_signal",operand_1.value,operand_2.value)
+	else:
+		error("bad instruction")
 	
 	pass
 
