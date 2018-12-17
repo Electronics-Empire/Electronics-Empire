@@ -16,8 +16,8 @@ func __generation_finished__():
 	randomize()
 	call_deferred("add_child", self.lg401_module)
 	
-	var random_x_location = (randi()%int(self.world.get_used_rect().size.x))*self.globals.tileSize.x
-	var random_y_location = (randi()%int(self.world.get_used_rect().size.y))*self.globals.tileSize.y
+	var random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
+	var random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
 	self.lg401_module.set_position(Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2))
 	
 	while(self.world.get_cell((self.lg401_module.get_position().x/self.globals.tileSize.x), (self.lg401_module.get_position().y/self.globals.tileSize.y)) == self.world.water

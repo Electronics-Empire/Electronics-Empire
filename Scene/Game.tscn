@@ -8,6 +8,7 @@
 
 [node name="Game" type="Node" index="0"]
 
+editor/display_folded = true
 script = ExtResource( 1 )
 
 [node name="World" type="TileMap" parent="." index="0"]

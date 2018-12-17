@@ -9,3 +9,9 @@ export_presets.cfg
 # System/tool-specific ignores
 .directory
 *~
+
+#executable
+*.pck
+linux_exec.x86_64
+MacOS_exec.zip
+windows_exec.exe
