@@ -56,5 +56,15 @@ func __generate_world__():
 	emit_signal("Generation_finished_signal")
 	pass
 
+remote func __ask_sync_world__():
+	for i in range(self.get_used_rect().size.x+1):
+		for j in range(self.get_used_rect().size.y+1):
+			rpc_id(get_tree().get_rpc_sender_id(), "__sync_world__",i-1, j-1, get_cell(i-1,j-1))
+	pass
+
+remote func __sync_world__(x,y,tile):
+	self.set_cell(x,y,tile)
+	pass
+
 func _ready():
 	pass
