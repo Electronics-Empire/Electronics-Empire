@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Script/Multiplayer.gd" type="Script" id=1]
 
-[node name="Lobby" type="MarginContainer" index="0"]
+[node name="Lobby" type="MarginContainer"]
 
 anchor_left = 0.0
 anchor_top = 0.5

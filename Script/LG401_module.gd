@@ -12,8 +12,19 @@ var movement
 var globals
 var sprite
 var ray_cast
+var entity_name
 
 var active
+
+func __ask_entity_sync__():
+	rpc_id(get_tree().get_rpc_sender_id(), "__entity_sync__", self.sprite.animation, self.sprite.frame, self.position)
+	pass
+
+remote func __entity_sync__(animation, frame, pos):
+	self.sprite.animation = animation
+	self.sprite.frame = frame
+	self.position = pos
+	pass
 
 
 func __send_line__(text):
@@ -76,6 +87,8 @@ func _ready():
 	self.clock.set_wait_time(self.clock_time)
 	self.clock.set_one_shot(true)
 	self.add_child(self.clock)
+	
+	self.entity_name = "LG401"
 	
 	self.clock_bar = get_node("Clock_bar")
 	self.interpreter = get_node("LG401_Interpreter")
