@@ -5,12 +5,15 @@ var world
 var globals
 var alert_dialog
 var network_info
+var focus_target
 
 func generate_object():
 	pass
 
 func generate_player():
 	var lg401_module = load("res://Scene/LG401_module.tscn").instance()
+	lg401_module.own = get_tree().get_network_unique_id()
+	self.focus_target = lg401_module
 	self.add_child(lg401_module)
 	
 	var random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
@@ -68,7 +71,7 @@ func __generation_finished__():
 	pass
 
 func __execute_button__(text):
-	self.lg401_module.__send_line__(text)
+	self.focus_target.__send_line__(text)
 	pass
 
 func __new_peer__(id):

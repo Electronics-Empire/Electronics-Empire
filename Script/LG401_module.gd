@@ -13,6 +13,7 @@ var globals
 var sprite
 var ray_cast
 var entity_name
+var own
 
 var active
 
