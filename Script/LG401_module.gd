@@ -18,7 +18,7 @@ var own
 var active
 
 func __ask_entity_sync__():
-	rpc_id(get_tree().get_rpc_sender_id(), "__entity_sync__", self.sprite.animation, self.sprite.frame, self.position)
+	rpc("__entity_sync__", self.sprite.animation, self.sprite.frame, self.position)
 	pass
 
 remote func __entity_sync__(animation, frame, pos):
