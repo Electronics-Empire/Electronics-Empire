@@ -28,7 +28,7 @@ remote func __entity_sync__(animation, frame, pos):
 	pass
 
 
-func __send_line__(text):
+sync func __send_line__(text):
 	
 	if(!is_active()):
 	
@@ -50,7 +50,10 @@ func __send_line__(text):
 	
 	pass
 
-func __walk__(direction, count):
+func __walk_rpc_wrapper__(direction, count):
+	rpc("__walk__", direction, count)
+
+sync func __walk__(direction, count):
 	if(count):
 		match(direction):
 			"north":
@@ -73,13 +76,22 @@ func __tween_stopped__():
 	reset_active()
 	pass
 
-func __add_executed__():
+func __add_rpc_wrapper__():
+	rpc("__add_executed__()")
+	pass
+
+sync func __add_executed__():
 	reset_active()
 	pass
 
-func __sub_executed__():
+func __sub_rpc_wrapper__():
+	rpc("__add_executed__()")
+	pass
+
+sync func __sub_executed__():
 	reset_active()
 	pass
+
 
 func _ready():
 	self.clock_time = 1
@@ -98,9 +110,9 @@ func _ready():
 	self.sprite = get_node("AnimatedSprite")
 	self.ray_cast = get_node("Collision_checker")
 	
-	self.interpreter.connect("walk_signal", self, "__walk__")
-	self.interpreter.connect("add_signal", self, "__add_executed__")
-	self.interpreter.connect("sub_signal", self, "__sub_executed__")
+	self.interpreter.connect("walk_signal", self, "__walk_rpc_wrapper__")
+	self.interpreter.connect("add_signal", self, "__add_rpc_wrapper__")
+	self.interpreter.connect("sub_signal", self, "__sub_rpc_wrapper__")
 	
 	reset_active()
 	pass
