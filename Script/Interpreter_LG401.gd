@@ -4,12 +4,16 @@ enum LG401_type{
 	PLUS,
 	MINUS,
 	WALK,
+	ATTACK,
+	ROTATE,
 	DIRECTION
 }
 
 signal walk_signal
 signal add_signal
 signal sub_signal
+signal attack_signal
+signal rotate_signal
 
 var direction_names
 
@@ -76,13 +80,27 @@ func evaluate():
 				eat(LG401_type.WALK)
 				
 				self.operand_1 = self.current_token
-				eat(LG401_type.DIRECTION)
-				
-				self.operand_2 = self.current_token
 				eat(BASE_type.INTEGER)
 				
 				if(!self.error_occur):
-					emit_signal("walk_signal",operand_1.value,operand_2.value)
+					emit_signal("walk_signal",operand_1.value)
+				
+			LG401_type.ATTACK:
+				
+				eat(LG401_type.ATTACK)
+				
+				if(!self.error_occur):
+					emit_signal("attack_signal")
+				
+			LG401_type.ROTATE:
+				
+				eat(LG401_type.ROTATE)
+				
+				self.operand_1 = self.current_token
+				eat(LG401_type.DIRECTION)
+				
+				if(!self.error_occur):
+					emit_signal("rotate_signal",operand_1.value)
 	else:
 		error("bad instruction")
 	
@@ -100,16 +118,27 @@ func get_next_token():
 			advance()
 			self.current_token = Token.new(LG401_type.PLUS, null)
 			return
-	
+			
 		"sub":
 			advance()
 			self.current_token = Token.new(LG401_type.MINUS, null)
 			return
+			
 		"walk":
 			advance()
 			self.current_token = Token.new(LG401_type.WALK, null)
 			return
-	
+			
+		"attack":
+			advance()
+			self.current_token = Token.new(LG401_type.ATTACK, null)
+			return
+			
+		"rotate":
+			advance()
+			self.current_token = Token.new(LG401_type.ROTATE, null)
+			return
+			
 	if(self.cur_lexeme in direction_names):
 		advance()
 		self.current_token = Token.new(LG401_type.DIRECTION, self.cur_lexeme)

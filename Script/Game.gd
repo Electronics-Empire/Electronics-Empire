@@ -109,7 +109,8 @@ func __generation_finished__():
 
 # send a line when we click on the execute button
 func __execute_button__(text):
-	self.get_node(self.focus_target_path).rpc("__send_line__",text)
+	if(self.get_node(self.focus_target_path) != null):
+		self.get_node(self.focus_target_path).rpc("__send_line__",text)
 	pass
 
 # function is call on the server and client when a new peer is connected
