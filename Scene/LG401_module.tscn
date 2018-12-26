@@ -92,7 +92,7 @@ animations = [ {
 custom_solver_bias = 0.0
 extents = Vector2( 10, 10 )
 
-[node name="LG401_module" type="KinematicBody2D" index="0"]
+[node name="LG401_module" type="KinematicBody2D"]
 
 position = Vector2( 16, 16 )
 input_pickable = false
