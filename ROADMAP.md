@@ -8,3 +8,7 @@
 - multiplayer implemented
 - player can attack
 - player can die
+
+0.2(unit & ressource):
+- first unit
+- basic ressource
