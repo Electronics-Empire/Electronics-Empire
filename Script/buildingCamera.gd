@@ -6,7 +6,7 @@ var mouvement = Vector2(0,0)
 
 
 func _physics_process(delta):
-	if self.current:
+	if(self.current):
 		mouvement = Vector2(0,0)
 		
 		#right

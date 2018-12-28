@@ -5,93 +5,48 @@ var world
 var globals
 var alert_dialog
 var network_info
-var focus_target_path
 
 # generate all the objects, empty for now
-func generate_object():
-	pass
-
-# generate the server player
-func generate_host_player():
-	var lg401_module = load("res://Scene/LG401_module.tscn").instance()
-	lg401_module.own = get_tree().get_network_unique_id()
-	self.add_child(lg401_module)
-	
-	var random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
-	var random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
-	lg401_module.set_position(Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2))
-	
-	while(self.world.get_cell((lg401_module.get_position().x/self.globals.tileSize.x), (lg401_module.get_position().y/self.globals.tileSize.y)) == self.world.water
-		  || self.world.get_cell((lg401_module.get_position().x/self.globals.tileSize.x), (lg401_module.get_position().y/self.globals.tileSize.y)) == self.world.border):
-		random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
-		random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
-		lg401_module.set_position(Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2))
-	
-	lg401_module.set_name(lg401_module.get_path().get_name(lg401_module.get_path().get_name_count()-1))
-	self.network_info.entity_list.append(lg401_module.get_path())
-	self.focus_target_path = lg401_module.get_path()
+func __generate_object__():
 	pass
 
 # generate the client player
-func generate_client_player():
-	var lg401_module = load("res://Scene/LG401_module.tscn").instance()
-	lg401_module.own = get_tree().get_rpc_sender_id()
-	self.add_child(lg401_module)
+sync func generate_player(id):
+	var player = load("res://Script/player.gd").instance()
+	add_child(player)
+	var random_x_location
+	var random_y_location
+	var init_pos
 	
-	var random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
-	var random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
-	lg401_module.set_position(Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2))
+	random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
+	random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
+	init_pos = Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2)
 	
-	while(self.world.get_cell((lg401_module.get_position().x/self.globals.tileSize.x), (lg401_module.get_position().y/self.globals.tileSize.y)) == self.world.water
-		  || self.world.get_cell((lg401_module.get_position().x/self.globals.tileSize.x), (lg401_module.get_position().y/self.globals.tileSize.y)) == self.world.border):
+	while(self.world.get_cell((init_pos.x/self.globals.tileSize.x), (init_pos.y/self.globals.tileSize.y)) == self.world.water
+		  || self.world.get_cell((init_pos.x/self.globals.tileSize.x), (init_pos.y/self.globals.tileSize.y)) == self.world.border):
 		random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
 		random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
-		lg401_module.set_position(Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2))
+		init_pos = Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2)
 	
-	lg401_module.set_name(lg401_module.get_path().get_name(lg401_module.get_path().get_name_count()-1))
-	self.network_info.entity_list.append(lg401_module.get_path())
-	rpc_id(get_tree().get_rpc_sender_id(), "__set_focus_target__", lg401_module.get_path())
+	player.generate_lg401(init_pos)
+	player.set_name(id)
+	self.network_info.player_list.append(id)
 	pass
 
-# change the focus target when a new client player is created
-remote func __set_focus_target__(path):
-	self.focus_target_path = path
+remote func ask_sync_player():
+	for player in self.network_info.player_list:
+		rpc("sync_player", player)
+	pass
+
+sync func sync_player(player):
+	if(!has_node(player)):
+		generate_player(player)
+		get_node(player).ask_player_sync()
 
 # pause all the player
-sync func __pause_all__():
-	self.alert_dialog.__show_dialog__("the game is synchronizing with the new player")
+sync func pause_all():
+	self.alert_dialog.show_dialog("the game is synchronizing with the new player")
 	get_tree().set_pause(true)
-	pass
-
-# the synchronization is complete, resume all the player
-sync func __continue_all__():
-	get_tree().set_pause(false)
-	self.alert_dialog.__close_dialog__()
-	pass
-	
-
-# ask the server to sync all the entities
-remote func __ask_sync_entity__():
-	for path in self.network_info.entity_list:
-		rpc("__create_sync_entity__", path, get_node(path).entity_name)
-		get_node(path).__ask_entity_sync__()
-	rpc("__continue_all__")
-	pass
-
-# called when we create a new entities
-remote func __client_create_entity__(name):
-	match(name):
-		"player":
-			generate_client_player()
-
-# create a new server entity if the path dosen't exist
-remote func __create_sync_entity__(path, name):
-	if !has_node(path):
-		match(name):
-			"LG401":
-				var lg401_module = load("res://Scene/LG401_module.tscn").instance()
-				lg401_module.set_name(path.get_name(path.get_name_count()-1))
-				self.add_child(lg401_module)
 	pass
 
 # call in Multiplayer.gd, generate the world
@@ -103,7 +58,7 @@ func __generate_world__():
 # the remaining components
 func __generation_finished__():
 	randomize()
-	generate_host_player()
+	generate_player(get_tree().get_network_unique_id())
 	generate_object()
 	pass
 
@@ -125,9 +80,9 @@ func __peer_left__(id):
 # function is call on the client when a new peer is connected
 func __player_connection__():
 	rpc("__pause_all__")
-	rpc_id(1,"__client_create_entity__", "player")
+	rpc_id(1, "generate_player", get_tree().get_network_unique_id())
 	self.world.rpc_id(1,"__ask_sync_world__")
-	rpc_id(1,"__ask_sync_entity__")
+	rpc_id(1,"__ask_sync_player__")
 	pass
 
 # function is call on the client when a peer failed to connect
