@@ -19,7 +19,7 @@ func __create_button__():
 		return
 	
 	get_tree().set_network_peer(peer)
-	self.gameScene.__generate_world__()
+	self.gameScene.generate_world()
 	pass
 	
 func __connect_button__():
