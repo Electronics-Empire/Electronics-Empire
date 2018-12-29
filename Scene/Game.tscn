@@ -71,9 +71,4 @@ _sections_unfolded = [ "Drag Margin", "Editor", "Limit", "Offset", "Smoothing" ]
 
 [node name="GUI" parent="Camera2D" index="0" instance=ExtResource( 5 )]
 
-margin_left = -512.0
-margin_top = -291.0
-margin_right = 511.0
-margin_bottom = -167.0
-
 

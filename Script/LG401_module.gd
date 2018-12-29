@@ -28,7 +28,7 @@ var damage
 
 var active
 
-func __ask_entity_sync__():
+remote func __ask_entity_sync__():
 	rpc("__entity_sync__", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
 	pass
 

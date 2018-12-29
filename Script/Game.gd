@@ -12,7 +12,7 @@ func __generate_object__():
 
 # generate the client player
 sync func generate_player(id):
-	var player = load("res://Script/player.gd").instance()
+	var player = load("res://Script/player.gd").new()
 	add_child(player)
 	var random_x_location
 	var random_y_location
@@ -29,19 +29,23 @@ sync func generate_player(id):
 		init_pos = Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2)
 	
 	player.generate_lg401(init_pos)
-	player.set_name(id)
-	self.network_info.player_list.append(id)
+	player.set_name(str(id))
+	self.network_info.player_list.append(str(id))
 	pass
 
 remote func ask_sync_player():
 	for player in self.network_info.player_list:
 		rpc("sync_player", player)
+	rpc("continue_all")
 	pass
 
-sync func sync_player(player):
+remote func sync_player(player):
 	if(!has_node(player)):
-		generate_player(player)
-		get_node(player).ask_player_sync()
+		var new_player = load("res://Script/player.gd").new()
+		new_player.set_name(player)
+		add_child(new_player)
+		new_player.rpc_id(1,"ask_player_sync")
+	pass
 
 # pause all the player
 sync func pause_all():
@@ -49,48 +53,53 @@ sync func pause_all():
 	get_tree().set_pause(true)
 	pass
 
+# the synchronization is complete, resume all the player
+sync func continue_all():
+	get_tree().set_pause(false)
+	self.alert_dialog.close_dialog()
+	pass
+
 # call in Multiplayer.gd, generate the world
-func __generate_world__():
+func generate_world():
 	self.world.__generate_world__()
 	pass
 
 # signal in WorldGen.gd, when the world generation is finish we generate all
 # the remaining components
-func __generation_finished__():
+func generation_finished():
 	randomize()
 	generate_player(get_tree().get_network_unique_id())
-	generate_object()
+	__generate_object__()
 	pass
 
 # send a line when we click on the execute button
-func __execute_button__(text):
-	if(self.get_node(self.focus_target_path) != null):
-		self.get_node(self.focus_target_path).rpc("__send_line__",text)
+func execute_button(text):
+	self.get_node(str(get_tree().get_network_unique_id())).rpc("send_line",text)
 	pass
 
 # function is call on the server and client when a new peer is connected
-func __new_peer__(id):
+func new_peer(id):
 	print("network working!")
 	pass
 
 # function is call on the server and client when a peer disconnected
-func __peer_left__(id):
+func peer_left(id):
 	pass
 
 # function is call on the client when a new peer is connected
-func __player_connection__():
-	rpc("__pause_all__")
+func player_connection():
+	rpc("pause_all")
 	rpc_id(1, "generate_player", get_tree().get_network_unique_id())
 	self.world.rpc_id(1,"__ask_sync_world__")
-	rpc_id(1,"__ask_sync_player__")
+	rpc_id(1,"ask_sync_player")
 	pass
 
 # function is call on the client when a peer failed to connect
-func __player_connection_failed__():
+func player_connection_failed():
 	pass
 
 # function is call on the client when the server disconnect
-func __server_disconnected__():
+func server_disconnected():
 	pass
 
 func _ready():
@@ -101,12 +110,12 @@ func _ready():
 	self.network_info = get_node("/root/network_info")
 	self.alert_dialog = get_node("Camera2D/GUI/AlertDialog")
 	
-	self.execute_button.connect("button_pressed_signal", self, "__execute_button__")
-	self.world.connect("Generation_finished_signal", self, "__generation_finished__")
-	get_tree().connect("network_peer_connected", self, "__new_peer__")
-	get_tree().connect("network_peer_disconnected", self, "__peer_left__")
-	get_tree().connect("connected_to_server", self, "__player_connection__")
-	get_tree().connect("connection_failed", self, "__player_connection_failed__")
-	get_tree().connect("server_disconnected", self, "__server_disconnected__")
+	self.execute_button.connect("button_pressed_signal", self, "execute_button")
+	self.world.connect("Generation_finished_signal", self, "generation_finished")
+	get_tree().connect("network_peer_connected", self, "new_peer")
+	get_tree().connect("network_peer_disconnected", self, "peer_left")
+	get_tree().connect("connected_to_server", self, "player_connection")
+	get_tree().connect("connection_failed", self, "player_connection_failed")
+	get_tree().connect("server_disconnected", self, "server_disconnected")
 	
 	pass
