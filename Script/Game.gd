@@ -5,6 +5,7 @@ var world
 var globals
 var alert_dialog
 var network_info
+var ctrl_global
 
 # generate all the objects, empty for now
 func __generate_object__():
@@ -104,11 +105,12 @@ func server_disconnected():
 
 func _ready():
 	
-	self.execute_button = get_node("Camera2D/GUI/GUI_execute_button")
+	self.execute_button = get_node("Camera2D/GUI/PanelGUI/GUI_execute_button")
 	self.world = get_node("World")
 	self.globals = get_node("/root/globals")
 	self.network_info = get_node("/root/network_info")
-	self.alert_dialog = get_node("Camera2D/GUI/AlertDialog")
+	self.alert_dialog = get_node("Camera2D/GUI/PanelGUI/AlertDialog")
+	self.ctrl_global = get_node("/root/ctrl_global")
 	
 	self.execute_button.connect("button_pressed_signal", self, "execute_button")
 	self.world.connect("Generation_finished_signal", self, "generation_finished")
