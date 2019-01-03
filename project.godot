@@ -18,7 +18,7 @@ config/icon="res://icon.png"
 
 globals="*res://Script/globals.gd"
 network_info="*res://Script/network_info.gd"
-ctrl_global="*res://ctrl_global.gd"
+ctrl_global="*res://Script/ctrl_global.gd"
 
 [display]
 
