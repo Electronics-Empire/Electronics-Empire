@@ -18,6 +18,7 @@ config/icon="res://icon.png"
 
 globals="*res://Script/globals.gd"
 network_info="*res://Script/network_info.gd"
+ctrl_global="*res://ctrl_global.gd"
 
 [display]
 
@@ -34,6 +35,8 @@ CAMERA_RIGHT=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_na
 CAMERA_UP=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777232,"unicode":0,"echo":false,"script":null)
  ]
 CAMERA_DOWN=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777234,"unicode":0,"echo":false,"script":null)
+ ]
+ENTER=[ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777221,"unicode":0,"echo":false,"script":null)
  ]
 
 [rendering]
