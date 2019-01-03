@@ -1,7 +1,7 @@
 extends Panel
 
-onready var textEdit = get_node("TextEdit")
 
+onready var textEdit = get_node("TextEdit")
 func _ready():
 	# Called when the node is added to the scene for the first time.
 	# Initialization here
