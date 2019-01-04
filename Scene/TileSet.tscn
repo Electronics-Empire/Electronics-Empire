@@ -15,7 +15,7 @@ extents = Vector2( 26.0063, 25.9564 )
 custom_solver_bias = 0.0
 extents = Vector2( 31.8685, 31.9585 )
 
-[node name="TileSet" type="Node" index="0"]
+[node name="TileSet" type="Node"]
 
 [node name="Water" type="Sprite" parent="." index="0"]
 
