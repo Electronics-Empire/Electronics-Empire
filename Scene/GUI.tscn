@@ -1,4 +1,3 @@
-
 [gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Script/PanelGUI.gd" type="Script" id=1]
@@ -34,7 +33,7 @@ shadow_size = 0
 anti_aliasing = true
 anti_aliasing_size = 1
 
-[node name="GUI" type="CanvasLayer" index="0"]
+[node name="GUI" type="CanvasLayer"]
 
 layer = 1
 offset = Vector2( 0, 0 )
@@ -87,7 +86,6 @@ caret_blink = true
 caret_blink_speed = 0.65
 caret_position = 0
 script = ExtResource( 2 )
-
 _sections_unfolded = [ "Caret", "Placeholder" ]
 
 [node name="GUI_execute_button" type="Button" parent="PanelGUI" index="1"]
@@ -137,7 +135,6 @@ popup_exclusive = false
 window_title = "Alert!"
 resizable = false
 dialog_hide_on_ok = true
-
 script = ExtResource( 4 )
 
 [connection signal="gui_input" from="PanelGUI" to="PanelGUI" method="gui_input"]
