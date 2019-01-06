@@ -7,8 +7,28 @@ var alert_dialog
 var network_info
 var ctrl_global
 
-# generate all the objects, empty for now
+var carbon
+
+var object_pos = Array()
+
+# generate all the objects
 func __generate_object__():
+	__generate_carbon__()
+	pass
+
+# generate carbon ressources
+func __generate_carbon__():
+	var carbon_num = 5
+	while(carbon_num > 0):
+		var random_x = randi()%int(world.get_used_rect().size.x)
+		var random_y = randi()%int(world.get_used_rect().size.y)
+		
+		if((world.get_cell(random_x, random_y) == world.grass or world.get_cell(random_x, random_y) == world.dirt) and object_pos.find(Vector2(random_x, random_y)) == -1):
+			var new_carbon = self.carbon.instance()
+			add_child(new_carbon)
+			new_carbon.set_position(Vector2((random_x*globals.tileSize.x) + globals.tileSize.x/2, (random_y*globals.tileSize.y) + globals.tileSize.y/2))
+			object_pos.append(Vector2(random_x, random_y))
+			carbon_num -= 1
 	pass
 
 # generate the client player
@@ -111,6 +131,8 @@ func _ready():
 	self.network_info = get_node("/root/network_info")
 	self.alert_dialog = get_node("Camera2D/GUI/PanelGUI/AlertDialog")
 	self.ctrl_global = get_node("/root/ctrl_global")
+	
+	self.carbon = load("res://Scene/Carbon.tscn")
 	
 	self.execute_button.connect("button_pressed_signal", self, "execute_button")
 	self.world.connect("Generation_finished_signal", self, "generation_finished")
