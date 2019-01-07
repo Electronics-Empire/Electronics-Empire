@@ -153,7 +153,7 @@ func _ready():
 	self.clock_time = 1
 	self.max_health = 100
 	self.damage = 50
-	self.orientation = DIRECTION.north
+	self.orientation = DIRECTION.south
 	
 	self.clock = Timer.new()
 	self.clock.set_wait_time(self.clock_time)
@@ -172,6 +172,7 @@ func _ready():
 	
 	self.health_bar.max_value = self.max_health
 	self.health_bar.value = self.max_health
+	self.sprite.play("SOUTH")
 	
 	self.interpreter.connect("walk_signal", self, "__walk__")
 	self.interpreter.connect("add_signal", self, "__add_executed__")
