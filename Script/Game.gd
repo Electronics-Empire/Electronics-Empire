@@ -10,6 +10,7 @@ var ctrl_global
 var carbon
 
 var object_pos = Array()
+var object_array = Array()
 
 # generate all the objects
 func __generate_object__():
@@ -28,11 +29,12 @@ func __generate_carbon__():
 			add_child(new_carbon)
 			new_carbon.set_position(Vector2((random_x*globals.tileSize.x) + globals.tileSize.x/2, (random_y*globals.tileSize.y) + globals.tileSize.y/2))
 			object_pos.append(Vector2(random_x, random_y))
+			object_array.append(new_carbon)
 			carbon_num -= 1
 	pass
 
 # generate the client player
-sync func generate_player(id):
+remote func generate_player(id):
 	var player = load("res://Script/player.gd").new()
 	add_child(player)
 	var random_x_location
@@ -51,6 +53,7 @@ sync func generate_player(id):
 	
 	player.generate_lg401(init_pos)
 	player.set_name(str(id))
+	self.object_pos.append(init_pos)
 	self.network_info.player_list.append(str(id))
 	pass
 
@@ -66,6 +69,21 @@ remote func sync_player(player):
 		new_player.set_name(player)
 		add_child(new_player)
 		new_player.rpc_id(1,"ask_player_sync")
+	pass
+
+remote func ask_sync_object():
+	for object in object_array:
+		if(object.get_filename() == self.carbon.get_path()):
+			print("allo")
+			rpc("sync_carbon", object.position.x, object.position.y)
+	pass
+
+remote func sync_carbon(x,y):
+	var new_carbon = self.carbon.instance()
+	add_child(new_carbon)
+	new_carbon.set_position(Vector2(x,y))
+	object_pos.append(Vector2(x, y))
+	object_array.append(new_carbon)
 	pass
 
 # pause all the player
@@ -113,6 +131,7 @@ func player_connection():
 	rpc_id(1, "generate_player", get_tree().get_network_unique_id())
 	self.world.rpc_id(1,"__ask_sync_world__")
 	rpc_id(1,"ask_sync_player")
+	rpc_id(1, "ask_sync_object")
 	pass
 
 # function is call on the client when a peer failed to connect
