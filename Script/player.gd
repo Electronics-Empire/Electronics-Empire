@@ -24,9 +24,10 @@ remote func ask_player_sync():
 	pass
 
 remote func player_sync():
-	self.lg401_module = load("res://Scene/LG401_module.tscn").instance()
-	add_child(self.lg401_module)
-	self.lg401_module.rpc_id(1,"__ask_entity_sync__")
+	if(!has_node("LG401_module")):
+		self.lg401_module = load("res://Scene/LG401_module.tscn").instance()
+		add_child(self.lg401_module)
+		self.lg401_module.rpc_id(1,"__ask_entity_sync__")
 	pass
 
 
