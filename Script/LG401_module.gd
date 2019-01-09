@@ -28,6 +28,8 @@ var damage
 
 var active
 
+signal dead_signal
+
 remote func __ask_entity_sync__():
 	rpc("__entity_sync__", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
 	pass
@@ -147,7 +149,7 @@ func receive_damage(damage):
 		self.die()
 
 func die():
-	self.queue_free()
+	emit_signal("dead_signal")
 
 func _ready():
 	self.clock_time = 1
