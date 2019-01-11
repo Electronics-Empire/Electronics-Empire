@@ -26,15 +26,19 @@ var own
 var orientation
 var damage
 
+var carbon
+
 var active
 
+
+signal add_ressource_signal
 signal dead_signal
 
-remote func __ask_entity_sync__():
-	rpc("__entity_sync__", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
+remote func ask_entity_sync():
+	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
 	pass
 
-remote func __entity_sync__(animation, frame, pos, health, orientation):
+remote func entity_sync(animation, frame, pos, health, orientation):
 	self.sprite.animation = animation
 	self.sprite.frame = frame
 	self.position = pos
@@ -43,11 +47,11 @@ remote func __entity_sync__(animation, frame, pos, health, orientation):
 	pass
 
 
-sync func __send_line__(text):
+sync func send_line(text):
 	
-	if(!is_active()):
+	if(!__is_active__()):
 	
-		set_active()
+		__set_active__()
 		self.clock_bar.show()
 		
 		self.clock.start()
@@ -59,51 +63,51 @@ sync func __send_line__(text):
 		self.interpreter.evaluate()
 		if(self.interpreter.error_occur):
 			self.interpreter.error_occur = false
-			reset_active()
+			__reset_active__()
 		else:
 			print(self.interpreter.registers["x"])
 	
 	pass
 
-func __walk__(count):
+func walk(count):
 	if(count):
 		match(self.orientation):
 			DIRECTION.north:
-				walk(Vector2(0,-globals.tileSize.y), count)
+				__walk__(Vector2(0,-globals.tileSize.y), count)
 			DIRECTION.south:
-				walk(Vector2(0,globals.tileSize.y), count)
+				__walk__(Vector2(0,globals.tileSize.y), count)
 			DIRECTION.east:
-				walk(Vector2(globals.tileSize.x,0), count)
+				__walk__(Vector2(globals.tileSize.x,0), count)
 			DIRECTION.west:
-				walk(Vector2(-globals.tileSize.x, 0), count)
+				__walk__(Vector2(-globals.tileSize.x, 0), count)
 	else:
-		reset_active()
+		__reset_active__()
 	pass
 
-func walk(dest, count):
+func __walk__(dest, count):
 	self.ray_cast.cast_to = dest
 	self.ray_cast.force_raycast_update()
 	
 	if(!self.ray_cast.is_colliding()):
 		self.movement.interpolate_property(self, "position", self.position, self.position+dest, 1, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-		self.movement.interpolate_callback(self, self.movement.get_runtime(), "__walk__", count-1)
+		self.movement.interpolate_callback(self, self.movement.get_runtime(), "walk", count-1)
 		self.movement.start()
 	else:
-		reset_active()
+		__reset_active__()
 
-func __tween_stopped__():
-	reset_active()
+func tween_stopped():
+	__reset_active__()
 	pass
 
-sync func __add_executed__():
-	reset_active()
+sync func add_executed():
+	__reset_active__()
 	pass
 
-sync func __sub_executed__():
-	reset_active()
+sync func sub_executed():
+	__reset_active__()
 	pass
 
-func __rotate__(direction):
+func rotate(direction):
 	match(direction):
 		"north":
 			self.orientation = DIRECTION.north
@@ -117,39 +121,60 @@ func __rotate__(direction):
 		"west":
 			self.orientation = DIRECTION.west
 			sprite.play("WEST")
-	reset_active()
+	__reset_active__()
 	pass
 
-func __attack__():
+func attack():
 	match(self.orientation):
 		DIRECTION.north:
-			attack(Vector2(0,-globals.tileSize.y))
+			__attack__(Vector2(0,-globals.tileSize.y))
 		DIRECTION.south:
-			attack(Vector2(0,globals.tileSize.y))
+			__attack__(Vector2(0,globals.tileSize.y))
 		DIRECTION.east:
-			attack(Vector2(globals.tileSize.x,0))
+			__attack__(Vector2(globals.tileSize.x,0))
 		DIRECTION.west:
-			attack(Vector2(-globals.tileSize.x,0))
-	reset_active()
+			__attack__(Vector2(-globals.tileSize.x,0))
+	__reset_active__()
 	pass
 
-func attack(dest):
+func __attack__(dest):
 	self.ray_cast.cast_to = dest
 	self.ray_cast.force_raycast_update()
 	
 	if(self.ray_cast.is_colliding()):
 		var obj = self.ray_cast.get_collider()
 		if(obj is KinematicBody2D):
-			obj.receive_damage(self.damage)
+			obj.__receive_damage__(self.damage)
 
-func receive_damage(damage):
+func __receive_damage__(damage):
 	self.health_bar.value -= damage
 	print(self.health_bar.value)
 	if(self.health_bar.value <= 0):
-		self.die()
+		self.__die__()
 
 func die():
 	emit_signal("dead_signal")
+
+func mine():
+	match(self.orientation):
+		DIRECTION.north:
+			__mine__(Vector2(0,-globals.tileSize.y))
+		DIRECTION.south:
+			__mine__(Vector2(0,globals.tileSize.y))
+		DIRECTION.east:
+			__mine__(Vector2(globals.tileSize.x,0))
+		DIRECTION.west:
+			__mine__(Vector2(-globals.tileSize.x,0))
+	__reset_active__()
+
+func __mine__(dest):
+	self.ray_cast.cast_to = dest
+	self.ray_cast.force_raycast_update()
+	
+	if(self.ray_cast.is_colliding()):
+		var obj = self.ray_cast.get_collider()
+		if(obj.is_in_group("Ressource")):
+			emit_signal("add_ressource_signal", obj.ressource_name, obj.mine())
 
 func _ready():
 	self.clock_time = 1
@@ -172,31 +197,34 @@ func _ready():
 	self.ray_cast = get_node("Collision_checker")
 	self.health_bar = get_node("Health_bar")
 	
+	self.carbon = load("res://Scene/Carbon.tscn").instance()
+	
 	self.health_bar.max_value = self.max_health
 	self.health_bar.value = self.max_health
 	self.sprite.play("SOUTH")
 	
-	self.interpreter.connect("walk_signal", self, "__walk__")
-	self.interpreter.connect("add_signal", self, "__add_executed__")
-	self.interpreter.connect("sub_signal", self, "__add_executed__")
-	self.interpreter.connect("rotate_signal", self, "__rotate__")
-	self.interpreter.connect("attack_signal", self, "__attack__")
+	self.interpreter.connect("walk_signal", self, "walk")
+	self.interpreter.connect("add_signal", self, "add_executed")
+	self.interpreter.connect("sub_signal", self, "sub_executed")
+	self.interpreter.connect("rotate_signal", self, "rotate")
+	self.interpreter.connect("attack_signal", self, "attack")
+	self.interpreter.connect("mine_signal", self, "mine")
 	
-	reset_active()
+	__reset_active__()
 	pass
 
 func _process(delta):
 	self.clock_bar.value = ((self.clock_time-self.clock.time_left)/self.clock_time)*100
 	pass
 
-func reset_active():
+func __reset_active__():
 	self.active = 0
 	pass
 
-func set_active():
+func __set_active__():
 	self.active = 1
 	pass
 
-func is_active():
+func __is_active__():
 	return self.active
 	pass
