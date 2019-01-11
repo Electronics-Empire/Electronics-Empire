@@ -82,7 +82,7 @@ remote func sync_player(player):
 		new_player.set_name(player)
 		add_child(new_player)
 		
-    new_player.connect("add_ressource_signal", self, "add_ressource")
+		new_player.connect("add_ressource_signal", self, "add_ressource")
 		new_player.connect("dead_signal", self, "dead_player")
 		
 		new_player.rpc_id(1,"ask_player_sync")
