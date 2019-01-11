@@ -6,6 +6,7 @@ var lg401_module
 var id
 
 signal add_ressource_signal
+signal dead_signal
 
 func _ready():
 	pass
@@ -15,15 +16,22 @@ func generate_lg401(init_pos_vector):
 	module.connect("add_ressource_signal", self, "add_ressource")
 	self.add_child(module)
 	
+	module.connect("dead_signal", self, "player_die")
+	
 	module.set_position(init_pos_vector)
 	self.lg401_module = module
 	pass
 
+func player_die():
+	emit_signal("dead_signal", self.id)
+	pass
+
 sync func send_line(text):
 	lg401_module.send_line(text)
+	pass
 
 remote func ask_player_sync():
-	rpc("player_sync")
+	rpc("player_sync", self.id)
 	pass
 
 remote func player_sync():

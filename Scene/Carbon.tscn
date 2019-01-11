@@ -3,9 +3,11 @@
 [ext_resource path="res://Script/Carbon.gd" type="Script" id=1]
 [ext_resource path="res://ObjectTile/Carbon.png" type="Texture" id=2]
 
+
 [sub_resource type="SpriteFrames" id=1]
 
 animations = [ {
+
 "frames": [ ExtResource( 2 ) ],
 "loop": true,
 "name": "default",
@@ -29,7 +31,9 @@ constant_linear_velocity = Vector2( 0, 0 )
 constant_angular_velocity = 0.0
 friction = 1.0
 bounce = 0.0
+
 script = ExtResource( 1 )
+
 _sections_unfolded = [ "Transform" ]
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="." index="0"]

@@ -30,7 +30,9 @@ var carbon
 
 var active
 
+
 signal add_ressource_signal
+signal dead_signal
 
 remote func ask_entity_sync():
 	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
@@ -150,8 +152,8 @@ func __receive_damage__(damage):
 	if(self.health_bar.value <= 0):
 		self.__die__()
 
-func __die__():
-	self.queue_free()
+func die():
+	emit_signal("dead_signal")
 
 func mine():
 	match(self.orientation):

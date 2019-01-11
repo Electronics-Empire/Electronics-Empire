@@ -38,8 +38,8 @@ func __generate_carbon__():
 # generate the client player
 remote func generate_player(id):
 	var player = load("res://Script/player.gd").new()
-	player.connect("add_ressource_signal", self, "add_ressource")
 	add_child(player)
+	player.id = id
 	var random_x_location
 	var random_y_location
 	var init_pos
@@ -57,8 +57,17 @@ remote func generate_player(id):
 	player.generate_lg401(init_pos)
 	player.set_name(str(id))
 	player.id = id
+  
+	player.connect("add_ressource_signal", self, "add_ressource")
+	player.connect("dead_signal", self, "dead_player")
+  
 	self.object_pos.append(init_pos)
 	self.network_info.player_list.append(str(id))
+	pass
+
+func dead_player(id):
+	get_node(str(id)).queue_free()
+	self.network_info.player_list.erase(str(id))
 	pass
 
 remote func ask_sync_player():
@@ -71,8 +80,11 @@ remote func sync_player(player):
 	if(!has_node(player)):
 		var new_player = load("res://Script/player.gd").new()
 		new_player.set_name(player)
-		new_player.connect("add_ressource_signal", self, "add_ressource")
 		add_child(new_player)
+		
+    new_player.connect("add_ressource_signal", self, "add_ressource")
+		new_player.connect("dead_signal", self, "dead_player")
+		
 		new_player.rpc_id(1,"ask_player_sync")
 	pass
 
@@ -85,6 +97,7 @@ remote func ask_sync_object():
 
 remote func sync_carbon(x,y):
 	var new_carbon = self.carbon_obj.instance()
+
 	add_child(new_carbon)
 	new_carbon.set_position(Vector2(x,y))
 	object_pos.append(Vector2(x, y))
@@ -112,7 +125,7 @@ func generate_world():
 # the remaining components
 func generation_finished():
 	randomize()
-	generate_player(get_tree().get_network_unique_id())
+	generate_player(1)
 	__generate_object__()
 	pass
 
@@ -134,6 +147,7 @@ func new_peer(id):
 
 # function is call on the server and client when a peer disconnected
 func peer_left(id):
+	dead_player(id)
 	pass
 
 # function is call on the client when a new peer is connected
