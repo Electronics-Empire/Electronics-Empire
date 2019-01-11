@@ -1,15 +1,18 @@
 extends Node
 
 var unit_list = Array()
+var ressource_dict = Dictionary()
 var lg401_module
 var id
 
+signal add_ressource_signal
+
 func _ready():
-	id = get_tree().get_network_unique_id()
 	pass
 
 func generate_lg401(init_pos_vector):
 	var module = load("res://Scene/LG401_module.tscn").instance()
+	module.connect("add_ressource_signal", self, "add_ressource")
 	self.add_child(module)
 	
 	module.set_position(init_pos_vector)
@@ -17,7 +20,7 @@ func generate_lg401(init_pos_vector):
 	pass
 
 sync func send_line(text):
-	lg401_module.__send_line__(text)
+	lg401_module.send_line(text)
 
 remote func ask_player_sync():
 	rpc("player_sync")
@@ -26,8 +29,21 @@ remote func ask_player_sync():
 remote func player_sync():
 	if(!has_node("LG401_module")):
 		self.lg401_module = load("res://Scene/LG401_module.tscn").instance()
+		
+		lg401_module.connect("add_ressource_signal", self, "add_ressource")
+		
 		add_child(self.lg401_module)
 		self.lg401_module.rpc_id(1,"__ask_entity_sync__")
+	pass
+
+func add_ressource(ressource, num):
+	if(ressource_dict.has(ressource)):
+		ressource_dict[ressource] += num
+	else:
+		ressource_dict[ressource] = num
+	
+	if(id == get_tree().get_network_unique_id()):
+		emit_signal("add_ressource_signal", ressource, ressource_dict[ressource])
 	pass
 
 
