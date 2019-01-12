@@ -1,8 +1,6 @@
 extends "Interpreter_base.gd"
 
 enum LG401_type{
-	PLUS,
-	MINUS,
 	WALK,
 	ATTACK,
 	ROTATE,
@@ -20,9 +18,9 @@ signal mine_signal
 var direction_names
 
 func _init():
-	self.register_names = PoolStringArray(["x"])
+	self.register_names = PoolStringArray()
 	self.direction_names = PoolStringArray(["north", "south", "east", "west"])
-	self.registers = {"x":0}
+	self.registers = {}
 	pass
 
 func evaluate():
@@ -32,51 +30,6 @@ func evaluate():
 	
 	if(instruction != null):
 		match(instruction.type):
-			
-			LG401_type.PLUS:
-				
-				eat(LG401_type.PLUS)
-				
-				inst_2V_1R()
-				
-				if(!self.error_occur):
-					var temp = 0
-					
-					if(self.operand_1.type == BASE_type.REGISTER):
-						temp = self.registers[self.operand_1.value]
-					else:
-						temp = self.operand_1.value
-						
-					if(self.operand_2.type == BASE_type.REGISTER):
-						temp += self.registers[self.operand_2.value]
-					else:
-						temp += self.operand_2.value
-					
-					self.registers[self.operand_3.value] = temp
-					emit_signal("add_signal")
-				
-			LG401_type.MINUS:
-				
-				eat(LG401_type.MINUS)
-				
-				inst_2V_1R()
-				
-				if(!self.error_occur):
-					var temp = 0
-					
-					if(self.operand_1.type == BASE_type.REGISTER):
-						temp = self.registers[self.operand_1.value]
-					else:
-						temp = self.operand_1.value
-						
-					if(self.operand_2.type == BASE_type.REGISTER):
-						temp -= self.registers[self.operand_2.value]
-					else:
-						temp -= self.operand_2.value
-					
-					self.registers[self.operand_3.value] = temp
-					emit_signal("sub_signal")
-				
 			LG401_type.WALK:
 				
 				eat(LG401_type.WALK)
@@ -138,12 +91,12 @@ func get_next_token():
 			self.current_token = Token.new(LG401_type.WALK, null)
 			return
 			
-		"attack":
+		"att":
 			advance()
 			self.current_token = Token.new(LG401_type.ATTACK, null)
 			return
 			
-		"rotate":
+		"rot":
 			advance()
 			self.current_token = Token.new(LG401_type.ROTATE, null)
 			return
