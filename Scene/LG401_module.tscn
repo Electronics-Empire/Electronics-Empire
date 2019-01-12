@@ -2,93 +2,39 @@
 
 [ext_resource path="res://Script/LG401_module.gd" type="Script" id=1]
 [ext_resource path="res://Script/Interpreter_LG401.gd" type="Script" id=2]
-[ext_resource path="res://ObjectTile/LG401_module_LEFT_1.png" type="Texture" id=3]
-[ext_resource path="res://ObjectTile/LG401_module_DOWN_1.png" type="Texture" id=4]
-[ext_resource path="res://ObjectTile/LG401_module_DOWN_2.png" type="Texture" id=5]
-[ext_resource path="res://ObjectTile/LG401_module_RIGHT_1.png" type="Texture" id=6]
-[ext_resource path="res://ObjectTile/LG401_module_UP_1.png" type="Texture" id=7]
+[ext_resource path="res://engine_asset/health_bar_fg.tres" type="StyleBox" id=3]
+[ext_resource path="res://engine_asset/health_bar_bg.tres" type="StyleBox" id=4]
+[ext_resource path="res://ObjectTile/LG401_module_DOWN_1.png" type="Texture" id=5]
+[ext_resource path="res://ObjectTile/LG401_module_DOWN_2.png" type="Texture" id=6]
+[ext_resource path="res://ObjectTile/LG401_module_RIGHT_1.png" type="Texture" id=7]
+[ext_resource path="res://ObjectTile/LG401_module_LEFT_1.png" type="Texture" id=8]
+[ext_resource path="res://ObjectTile/LG401_module_UP_1.png" type="Texture" id=9]
 
-[sub_resource type="StyleBoxFlat" id=1]
-
-content_margin_left = -1.0
-content_margin_right = -1.0
-content_margin_top = -1.0
-content_margin_bottom = -1.0
-bg_color = Color( 0.675781, 0.0633545, 0.0633545, 1 )
-draw_center = true
-border_width_left = 0
-border_width_top = 0
-border_width_right = 0
-border_width_bottom = 0
-border_color = Color( 0.8, 0.8, 0.8, 1 )
-border_blend = false
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-corner_detail = 8
-expand_margin_left = 0.0
-expand_margin_right = 0.0
-expand_margin_top = 0.0
-expand_margin_bottom = 0.0
-shadow_color = Color( 0, 0, 0, 0.6 )
-shadow_size = 0
-anti_aliasing = true
-anti_aliasing_size = 1
-
-[sub_resource type="StyleBoxFlat" id=2]
-
-content_margin_left = -1.0
-content_margin_right = -1.0
-content_margin_top = -1.0
-content_margin_bottom = -1.0
-bg_color = Color( 0, 0, 0, 1 )
-draw_center = true
-border_width_left = 0
-border_width_top = 0
-border_width_right = 0
-border_width_bottom = 0
-border_color = Color( 0.8, 0.8, 0.8, 1 )
-border_blend = false
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0
-corner_detail = 8
-expand_margin_left = 0.0
-expand_margin_right = 0.0
-expand_margin_top = 0.0
-expand_margin_bottom = 0.0
-shadow_color = Color( 0, 0, 0, 0.6 )
-shadow_size = 0
-anti_aliasing = true
-anti_aliasing_size = 1
-
-[sub_resource type="SpriteFrames" id=3]
+[sub_resource type="SpriteFrames" id=1]
 
 animations = [ {
-"frames": [ ExtResource( 3 ) ],
-"loop": true,
-"name": "WEST",
-"speed": 1.0
-}, {
-"frames": [ ExtResource( 4 ), ExtResource( 5 ) ],
+"frames": [ ExtResource( 5 ), ExtResource( 6 ) ],
 "loop": true,
 "name": "SOUTH",
 "speed": 1.0
 }, {
-"frames": [ ExtResource( 6 ) ],
+"frames": [ ExtResource( 7 ) ],
 "loop": true,
 "name": "EAST",
 "speed": 1.0
 }, {
-"frames": [ ExtResource( 7 ) ],
+"frames": [ ExtResource( 8 ) ],
+"loop": true,
+"name": "WEST",
+"speed": 1.0
+}, {
+"frames": [ ExtResource( 9 ) ],
 "loop": true,
 "name": "NORTH",
 "speed": 1.0
 } ]
 
-[sub_resource type="RectangleShape2D" id=4]
+[sub_resource type="RectangleShape2D" id=2]
 
 custom_solver_bias = 0.0
 extents = Vector2( 31.5814, 31.7561 )
@@ -149,8 +95,8 @@ mouse_filter = 0
 mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 0
-custom_styles/fg = SubResource( 1 )
-custom_styles/bg = SubResource( 2 )
+custom_styles/fg = ExtResource( 3 )
+custom_styles/bg = ExtResource( 4 )
 min_value = 0.0
 max_value = 100.0
 step = 1.0
@@ -163,13 +109,13 @@ _sections_unfolded = [ "custom_styles" ]
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="." index="3"]
 
-frames = SubResource( 3 )
+frames = SubResource( 1 )
 animation = "NORTH"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." index="4"]
 
 visible = false
-shape = SubResource( 4 )
+shape = SubResource( 2 )
 
 [node name="Movement" type="Tween" parent="." index="5"]
 

@@ -76,16 +76,6 @@ func get_next_token():
 		return
 	
 	match(self.cur_lexeme):
-		"add":
-			advance()
-			self.current_token = Token.new(LG401_type.PLUS, null)
-			return
-			
-		"sub":
-			advance()
-			self.current_token = Token.new(LG401_type.MINUS, null)
-			return
-			
 		"walk":
 			advance()
 			self.current_token = Token.new(LG401_type.WALK, null)

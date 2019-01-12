@@ -37,7 +37,7 @@ animations = [ {
 custom_solver_bias = 0.0
 extents = Vector2( 31.5814, 31.7561 )
 
-[node name="BR100_module" type="KinematicBody2D" index="0"]
+[node name="BR100_module" type="KinematicBody2D"]
 
 position = Vector2( 32, 32 )
 input_pickable = false
