@@ -8,6 +8,7 @@ enum BR_type{
 	WALK,
 	ATTACK,
 	ROTATE,
+	MINE,
 	DIRECTION
 }
 
@@ -18,6 +19,7 @@ signal multiply_signal
 signal divide_signal
 signal attack_signal
 signal rotate_signal
+signal mine_signal
 
 var direction_names
 
@@ -149,6 +151,13 @@ func evaluate():
 				
 				if(!self.error_occur):
 					emit_signal("rotate_signal",operand_1.value)
+				
+			BR_type.MINE:
+				
+				eat(BR_type.MINE)
+				
+				if(!self.error_occur):
+					emit_signal("mine_signal")
 	else:
 		error("bad instruction")
 	
@@ -193,6 +202,11 @@ func get_next_token():
 			return
 			
 		"rot":
+			advance()
+			self.current_token = Token.new(BR_type.ROTATE, null)
+			return
+			
+		"mine":
 			advance()
 			self.current_token = Token.new(BR_type.ROTATE, null)
 			return

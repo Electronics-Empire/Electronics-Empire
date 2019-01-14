@@ -3,6 +3,7 @@ extends Node
 enum BASE_type{
 	INTEGER,
 	REGISTER,
+	STRING,
 	EOF
 }
 
@@ -75,6 +76,14 @@ func get_next_token():
 	if self.cur_lexeme in self.register_names:
 		advance()
 		self.current_token = Token.new(BASE_type.REGISTER, cur_lexeme)
+		return
+		
+	if(self.cur_lexeme.begins_with("\"") and self.cur_lexeme.ends_with("\"")):
+		self.cur_lexeme = line[pos]
+		advance()
+		self.cur_lexeme.erase(0, 1)
+		self.cur_lexeme.erase(self.cur_lexeme.length()-1, 1)
+		self.current_token = Token.new(BASE_type.STRING, self.cur_lexeme)
 		return
 
 # function for instruction with form INST REG/INT REG/INT REG

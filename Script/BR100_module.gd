@@ -22,17 +22,17 @@ var globals
 var sprite
 var ray_cast
 var entity_name
-var own
 var orientation
 var damage
 
-var carbon
+var code
+var code_pos
+var id
 
 var active
 
-
 signal add_ressource_signal
-signal dead_signal
+signal unit_dead_signal
 
 remote func ask_entity_sync():
 	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
@@ -47,26 +47,31 @@ remote func entity_sync(animation, frame, pos, health, orientation):
 	pass
 
 
-sync func send_line(text):
+sync func send_line():
 	
-	if(!__is_active__()):
+	if(code[code_pos] == ""):
+		__instruction_finished__()
+	self.interpreter.load_line(code[code_pos])
 	
-		__set_active__()
-		self.clock_bar.show()
+	self.clock_bar.show()
 		
-		self.clock.start()
-		yield(self.clock, "timeout")
+	self.clock.start()
+	yield(self.clock, "timeout")
 		
-		self.clock_bar.hide()
-		
-		self.interpreter.load_line(text)
-		self.interpreter.evaluate()
-		if(self.interpreter.error_occur):
-			self.interpreter.error_occur = false
-			__reset_active__()
-		else:
-			print(self.interpreter.registers["x"])
+	self.clock_bar.hide()
 	
+	self.interpreter.evaluate()
+	if(self.interpreter.error_occur):
+		__explode__()
+	else:
+		print(self.interpreter.registers["x"])
+		print(self.interpreter.registers["y"])
+		print(self.interpreter.registers["a"])
+	
+	pass
+
+func load_code(code):
+	self.code = code
 	pass
 
 func walk(count):
@@ -81,7 +86,7 @@ func walk(count):
 			DIRECTION.west:
 				__walk__(Vector2(-globals.tileSize.x, 0), count)
 	else:
-		__reset_active__()
+		__instruction_finished__()
 	pass
 
 func __walk__(dest, count):
@@ -93,18 +98,26 @@ func __walk__(dest, count):
 		self.movement.interpolate_callback(self, self.movement.get_runtime(), "walk", count-1)
 		self.movement.start()
 	else:
-		__reset_active__()
+		__instruction_finished__()
 
 func tween_stopped():
-	__reset_active__()
+	__instruction_finished__()
 	pass
 
-sync func add_executed():
-	__reset_active__()
+func add_executed():
+	__instruction_finished__()
 	pass
 
-sync func sub_executed():
-	__reset_active__()
+func sub_executed():
+	__instruction_finished__()
+	pass
+
+func multiply_executed():
+	__instruction_finished__()
+	pass
+
+func divide_executed():
+	__instruction_finished__()
 	pass
 
 func rotate(direction):
@@ -121,7 +134,7 @@ func rotate(direction):
 		"west":
 			self.orientation = DIRECTION.west
 			sprite.play("WEST")
-	__reset_active__()
+	__instruction_finished__()
 	pass
 
 func attack():
@@ -134,7 +147,7 @@ func attack():
 			__attack__(Vector2(globals.tileSize.x,0))
 		DIRECTION.west:
 			__attack__(Vector2(-globals.tileSize.x,0))
-	__reset_active__()
+	__instruction_finished__()
 	pass
 
 func __attack__(dest):
@@ -152,8 +165,8 @@ func __receive_damage__(damage):
 	if(self.health_bar.value <= 0):
 		self.__die__()
 
-func die():
-	emit_signal("dead_signal")
+func __die__():
+	emit_signal("unit_dead_signal")
 
 func mine():
 	match(self.orientation):
@@ -165,7 +178,7 @@ func mine():
 			__mine__(Vector2(globals.tileSize.x,0))
 		DIRECTION.west:
 			__mine__(Vector2(-globals.tileSize.x,0))
-	__reset_active__()
+	__instruction_finished__()
 
 func __mine__(dest):
 	self.ray_cast.cast_to = dest
@@ -187,17 +200,17 @@ func _ready():
 	self.clock.set_one_shot(true)
 	self.add_child(self.clock)
 	
+	self.code_pos = 0
+	
 	self.entity_name = "BR100"
 	
 	self.clock_bar = get_node("Clock_bar")
-	self.interpreter = get_node("LG401_Interpreter")
+	self.interpreter = get_node("BR100_Interpreter")
 	self.movement = get_node("Movement")
 	self.globals = get_node("/root/globals")
 	self.sprite = get_node("AnimatedSprite")
 	self.ray_cast = get_node("Collision_checker")
 	self.health_bar = get_node("Health_bar")
-	
-	self.carbon = load("res://Scene/Carbon.tscn").instance()
 	
 	self.health_bar.max_value = self.max_health
 	self.health_bar.value = self.max_health
@@ -206,25 +219,24 @@ func _ready():
 	self.interpreter.connect("walk_signal", self, "walk")
 	self.interpreter.connect("add_signal", self, "add_executed")
 	self.interpreter.connect("sub_signal", self, "sub_executed")
+	self.interpreter.connect("multiply_signal", self, "multiply_executed")
+	self.interpreter.connect("divide_signal", self, "divide_executed")
 	self.interpreter.connect("rotate_signal", self, "rotate")
 	self.interpreter.connect("attack_signal", self, "attack")
 	self.interpreter.connect("mine_signal", self, "mine")
 	
-	__reset_active__()
 	pass
 
 func _process(delta):
 	self.clock_bar.value = ((self.clock_time-self.clock.time_left)/self.clock_time)*100
 	pass
 
-func __reset_active__():
-	self.active = 0
+func __instruction_finished__():
+	self.code_pos += 1
+	if(self.code_pos >= code.size()):
+		self.code_pos = 0
+	send_line()
 	pass
 
-func __set_active__():
-	self.active = 1
-	pass
-
-func __is_active__():
-	return self.active
-	pass
+func __explode__():
+	self.__die__()

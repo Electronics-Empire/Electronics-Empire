@@ -22,17 +22,15 @@ var globals
 var sprite
 var ray_cast
 var entity_name
-var own
 var orientation
 var damage
-
-var carbon
 
 var active
 
 
 signal add_ressource_signal
 signal dead_signal
+signal build_signal
 
 remote func ask_entity_sync():
 	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
@@ -64,9 +62,6 @@ sync func send_line(text):
 		if(self.interpreter.error_occur):
 			self.interpreter.error_occur = false
 			__reset_active__()
-		else:
-			print(self.interpreter.registers["x"])
-	
 	pass
 
 func walk(count):
@@ -146,13 +141,34 @@ func __attack__(dest):
 		if(obj is KinematicBody2D):
 			obj.__receive_damage__(self.damage)
 
+func build(file_path, unit_type):
+	match(self.orientation):
+		DIRECTION.north:
+			__build__(Vector2(0,-globals.tileSize.y), file_path, unit_type)
+		DIRECTION.south:
+			__build__(Vector2(0,globals.tileSize.y), file_path, unit_type)
+		DIRECTION.east:
+			__build__(Vector2(globals.tileSize.x,0), file_path, unit_type)
+		DIRECTION.west:
+			__build__(Vector2(-globals.tileSize.x,0), file_path, unit_type)
+	__reset_active__()
+	pass
+
+func __build__(dest, file_path, unit_type):
+	self.ray_cast.cast_to = dest
+	self.ray_cast.force_raycast_update()
+	
+	if(!self.ray_cast.is_colliding()):
+		emit_signal("build_signal", file_path, unit_type, self.position + dest)
+	pass
+
 func __receive_damage__(damage):
 	self.health_bar.value -= damage
 	print(self.health_bar.value)
 	if(self.health_bar.value <= 0):
 		self.__die__()
 
-func die():
+func __die__():
 	emit_signal("dead_signal")
 
 func mine():
@@ -197,8 +213,6 @@ func _ready():
 	self.ray_cast = get_node("Collision_checker")
 	self.health_bar = get_node("Health_bar")
 	
-	self.carbon = load("res://Scene/Carbon.tscn").instance()
-	
 	self.health_bar.max_value = self.max_health
 	self.health_bar.value = self.max_health
 	self.sprite.play("SOUTH")
@@ -209,6 +223,7 @@ func _ready():
 	self.interpreter.connect("rotate_signal", self, "rotate")
 	self.interpreter.connect("attack_signal", self, "attack")
 	self.interpreter.connect("mine_signal", self, "mine")
+	self.interpreter.connect("build_signal", self, "build")
 	
 	__reset_active__()
 	pass

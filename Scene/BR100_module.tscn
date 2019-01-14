@@ -3,17 +3,17 @@
 [ext_resource path="res://Script/BR100_module.gd" type="Script" id=1]
 [ext_resource path="res://Script/Interpreter_BR.gd" type="Script" id=2]
 [ext_resource path="res://engine_asset/health_bar_fg.tres" type="StyleBox" id=3]
-[ext_resource path="res://ObjectTile/BR_100_DOWN.png" type="Texture" id=4]
+[ext_resource path="res://ObjectTile/BR_100_UP.png" type="Texture" id=4]
 [ext_resource path="res://ObjectTile/BR_100_RIGHT.png" type="Texture" id=5]
 [ext_resource path="res://ObjectTile/BR_100_LEFT.png" type="Texture" id=6]
-[ext_resource path="res://ObjectTile/BR_100_UP.png" type="Texture" id=7]
+[ext_resource path="res://ObjectTile/BR_100_DOWN.png" type="Texture" id=7]
 
 [sub_resource type="SpriteFrames" id=1]
 
 animations = [ {
 "frames": [ ExtResource( 4 ) ],
 "loop": true,
-"name": "SOUTH",
+"name": "NORTH",
 "speed": 1.0
 }, {
 "frames": [ ExtResource( 5 ) ],
@@ -28,7 +28,7 @@ animations = [ {
 }, {
 "frames": [ ExtResource( 7 ) ],
 "loop": true,
-"name": "NORTH",
+"name": "SOUTH",
 "speed": 1.0
 } ]
 
@@ -37,7 +37,7 @@ animations = [ {
 custom_solver_bias = 0.0
 extents = Vector2( 31.5814, 31.7561 )
 
-[node name="BR100_module" type="KinematicBody2D"]
+[node name="BR100_module" type="KinematicBody2D" index="0"]
 
 position = Vector2( 32, 32 )
 input_pickable = false

@@ -5,7 +5,8 @@ enum LG401_type{
 	ATTACK,
 	ROTATE,
 	DIRECTION,
-	MINE
+	MINE,
+	BUILD
 }
 
 signal walk_signal
@@ -14,6 +15,7 @@ signal sub_signal
 signal attack_signal
 signal rotate_signal
 signal mine_signal
+signal build_signal
 
 var direction_names
 
@@ -63,6 +65,19 @@ func evaluate():
 				
 				if(!self.error_occur):
 					emit_signal("mine_signal")
+				
+			LG401_type.BUILD:
+				
+				eat(LG401_type.BUILD)
+				
+				self.operand_1 = self.current_token
+				eat(BASE_type.STRING)
+				
+				self.operand_2 = self.current_token
+				eat(BASE_type.STRING)
+				
+				if(!self.error_occur):
+					emit_signal("build_signal", operand_1.value, operand_2.value)
 	else:
 		error("bad instruction")
 	
@@ -94,6 +109,11 @@ func get_next_token():
 		"mine":
 			advance()
 			self.current_token = Token.new(LG401_type.MINE, null)
+			return
+			
+		"bld":
+			advance()
+			self.current_token = Token.new(LG401_type.BUILD, null)
 			return
 			
 	if(self.cur_lexeme in direction_names):
