@@ -17,7 +17,7 @@ animations = [ {
 custom_solver_bias = 0.0
 extents = Vector2( 31.6762, 31.2892 )
 
-[node name="Carbon" type="StaticBody2D" groups=[
+[node name="Carbon" type="StaticBody2D" index="0" groups=[
 "Ressource",
 ]]
 

@@ -25,6 +25,7 @@ func generate_lg401(init_pos_vector):
 	
 	module.set_position(init_pos_vector)
 	self.lg401_module = module
+	module.owner_id = self.id
 	
 	ressource_dict = {"carbon" : 5}
 	pass
@@ -38,7 +39,7 @@ sync func send_line(text):
 	pass
 
 remote func ask_player_sync():
-	rpc("player_sync", self.id, self.ressource_dict)
+	rpc("player_sync", self.id, self.unit_id_iterator, self.ressource_dict)
 	
 	for id in self.unit_list:
 		var unit = get_node(unit_list[id])
@@ -48,17 +49,16 @@ remote func ask_player_sync():
 remote func unit_sync(id, entity_name):
 	var unit
 	if(!unit_list.has(id)):
-		match(entity_name):
-			"BR100":
-				unit = br100_module_scene.instance()
+		unit = __instance_by_name__(entity_name)
 		unit.set_name(str(id))
 		add_child(unit)
 		self.unit_list[id] = unit.get_path()
 		unit.rpc_id(1, "ask_entity_sync")
 	pass
 
-remote func player_sync(id, ressource_dict):
+remote func player_sync(id, unit_id_iterator, ressource_dict):
 	self.id = id
+	self.unit_id_iterator = unit_id_iterator
 	self.ressource_dict = ressource_dict
 	if(!has_node("LG401_module")):
 		self.lg401_module = load("res://Scene/LG401_module.tscn").instance()
@@ -94,15 +94,14 @@ func load_code(file_path, unit_type, init_position):
 sync func create_unit(code_array, unit_type, init_position):
 	var unit
 	if(__eat_ressource__(unit_type)):
-		match(unit_type):
-			"BR100":
-				unit = br100_module_scene.instance()
-		
+		unit = __instance_by_name__(unit_type)
 		unit.code = code_array
 		
 		unit.set_name(str(unit_id_iterator))
 		add_child(unit)
 		unit.set_position(init_position)
+		
+		unit.owner_id = self.id
 		
 		unit.id = unit_id_iterator
 		unit_list[unit_id_iterator] = unit.get_path()
@@ -127,3 +126,8 @@ func __eat_ressource__(unit_type):
 	
 	return true
 	pass
+
+func __instance_by_name__(unit_type):
+	match(unit_type):
+		"BR100":
+				return br100_module_scene.instance()

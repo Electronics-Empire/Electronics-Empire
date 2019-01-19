@@ -1,6 +1,7 @@
 extends StaticBody2D
 
 var ressource_name = "carbon"
+var owner_id = 0
 
 func mine():
 	self.queue_free()

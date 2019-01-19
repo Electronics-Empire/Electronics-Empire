@@ -20,20 +20,22 @@ var ray_cast
 var entity_name
 var orientation
 var damage
+var owner_id
 
 signal add_ressource_signal
 signal build_signal
 
 remote func ask_entity_sync():
-	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
+	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation, self.owner_id)
 	pass
 
-remote func entity_sync(animation, frame, pos, health, orientation):
+remote func entity_sync(animation, frame, pos, health, orientation, owner_id):
 	self.sprite.animation = animation
 	self.sprite.frame = frame
 	self.position = pos
 	self.health_bar.value = health
 	self.orientation = orientation
+	self.owner_id = owner_id
 	pass
 
 func walk(count):
@@ -52,19 +54,7 @@ func tween_stopped():
 	__reset_active__()
 	pass
 
-func add_executed():
-	__reset_active__()
-	pass
-
-func sub_executed():
-	__reset_active__()
-	pass
-
-func multiply_executed():
-	__reset_active__()
-	pass
-
-func divide_executed():
+func logic_executed():
 	__reset_active__()
 	pass
 

@@ -6,8 +6,8 @@
 [ext_resource path="res://engine_asset/health_bar_bg.tres" type="StyleBox" id=4]
 [ext_resource path="res://ObjectTile/LG401_module_DOWN_1.png" type="Texture" id=5]
 [ext_resource path="res://ObjectTile/LG401_module_DOWN_2.png" type="Texture" id=6]
-[ext_resource path="res://ObjectTile/LG401_module_RIGHT_1.png" type="Texture" id=7]
-[ext_resource path="res://ObjectTile/LG401_module_LEFT_1.png" type="Texture" id=8]
+[ext_resource path="res://ObjectTile/LG401_module_LEFT_1.png" type="Texture" id=7]
+[ext_resource path="res://ObjectTile/LG401_module_RIGHT_1.png" type="Texture" id=8]
 [ext_resource path="res://ObjectTile/LG401_module_UP_1.png" type="Texture" id=9]
 
 [sub_resource type="SpriteFrames" id=1]
@@ -20,12 +20,12 @@ animations = [ {
 }, {
 "frames": [ ExtResource( 7 ) ],
 "loop": true,
-"name": "EAST",
+"name": "WEST",
 "speed": 1.0
 }, {
 "frames": [ ExtResource( 8 ) ],
 "loop": true,
-"name": "WEST",
+"name": "EAST",
 "speed": 1.0
 }, {
 "frames": [ ExtResource( 9 ) ],
@@ -39,7 +39,9 @@ animations = [ {
 custom_solver_bias = 0.0
 extents = Vector2( 31.5814, 31.7561 )
 
-[node name="LG401_module" type="KinematicBody2D" index="0"]
+[node name="LG401_module" type="KinematicBody2D" groups=[
+"Unit",
+]]
 
 position = Vector2( 32, 32 )
 input_pickable = false

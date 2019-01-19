@@ -41,8 +41,6 @@ func _ready():
 	self.interpreter = get_node("LG401_Interpreter")
 	
 	self.interpreter.connect("walk_signal", self, "walk")
-	self.interpreter.connect("add_signal", self, "add_executed")
-	self.interpreter.connect("sub_signal", self, "sub_executed")
 	self.interpreter.connect("rotate_signal", self, "rotate")
 	self.interpreter.connect("attack_signal", self, "attack")
 	self.interpreter.connect("mine_signal", self, "mine")

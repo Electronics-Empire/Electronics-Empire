@@ -42,7 +42,9 @@ extents = Vector2( 31.5814, 31.7561 )
 custom_solver_bias = 0.0
 radius = 157.091
 
-[node name="BR100_module" type="KinematicBody2D" index="0"]
+[node name="BR100_module" type="KinematicBody2D" groups=[
+"Unit",
+]]
 
 position = Vector2( 32, 32 )
 input_pickable = false

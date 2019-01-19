@@ -9,15 +9,16 @@ var id
 signal unit_dead_signal
 
 remote func ask_entity_sync():
-	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation, self.code_pos, self.code )
+	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation, self.owner_id, self.code_pos, self.code )
 	pass
 
-remote func entity_sync(animation, frame, pos, health, orientation, code_pos, code):
+remote func entity_sync(animation, frame, pos, health, orientation, owner_id, code_pos, code):
 	self.sprite.animation = animation
 	self.sprite.frame = frame
 	self.position = pos
 	self.health_bar.value = health
 	self.orientation = orientation
+	self.owner_id = owner_id
 	self.code_pos = code_pos
 	self.code = code
 	send_line()
@@ -50,8 +51,35 @@ func load_code(code):
 	self.code = code
 	pass
 
+func jump(line):
+	self.code_pos = line-1
+	__reset_active__()
+	pass
+
+func look():
+	var body_list = look_area.get_overlapping_bodies()
+	if(!body_list.empty()):
+		var target = null
+		for body in body_list:
+			
+			if(body.is_in_group("Ressource")):
+				target = body
+				self.interpreter.registers["a"] = 1
+				
+			elif(target.is_in_group("Unit")):
+				if(body.owner_id != self.owner_id):
+					target = body
+					self.interpreter.registers["a"] = 2
+			
+		if(target != null):
+			self.interpreter.registers["x"] = (self.position.x - target.position.x) / globals.tileSize.x
+			self.interpreter.registers["y"] = (self.position.y - target.position.y) / globals.tileSize.y
+	__reset_active__()
+	pass
+
 func _ready():
 	._ready()
+	
 	self.code_pos = 0
 	
 	self.look_area = get_node("Look_area")

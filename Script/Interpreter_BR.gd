@@ -9,6 +9,10 @@ enum BR_type{
 	ATTACK,
 	ROTATE,
 	MINE,
+	LOOK,
+	COMPARE,
+	JUMP,
+	JUMP_EQUAL,
 	DIRECTION
 }
 
@@ -20,6 +24,9 @@ signal divide_signal
 signal attack_signal
 signal rotate_signal
 signal mine_signal
+signal look_signal
+signal compare_signal
+signal jump_signal
 
 var direction_names
 
@@ -27,6 +34,7 @@ func _init():
 	self.register_names = PoolStringArray(["x", "y", "a"])
 	self.direction_names = PoolStringArray(["north", "south", "east", "west"])
 	self.registers = {"x":0, "y":0, "a":0}
+	self.status_register = {"equal" : false}
 	pass
 
 func evaluate():
@@ -46,15 +54,8 @@ func evaluate():
 				if(!self.error_occur):
 					var temp = 0
 					
-					if(self.operand_1.type == BASE_type.REGISTER):
-						temp = self.registers[self.operand_1.value]
-					else:
-						temp = self.operand_1.value
-						
-					if(self.operand_2.type == BASE_type.REGISTER):
-						temp += self.registers[self.operand_2.value]
-					else:
-						temp += self.operand_2.value
+					temp = self.operand_1.value
+					temp += self.operand_2.value
 					
 					self.registers[self.operand_3.value] = temp
 					emit_signal("add_signal")
@@ -68,15 +69,8 @@ func evaluate():
 				if(!self.error_occur):
 					var temp = 0
 					
-					if(self.operand_1.type == BASE_type.REGISTER):
-						temp = self.registers[self.operand_1.value]
-					else:
-						temp = self.operand_1.value
-						
-					if(self.operand_2.type == BASE_type.REGISTER):
-						temp -= self.registers[self.operand_2.value]
-					else:
-						temp -= self.operand_2.value
+					temp = self.operand_1.value
+					temp -= self.operand_2.value
 					
 					self.registers[self.operand_3.value] = temp
 					emit_signal("sub_signal")
@@ -90,15 +84,8 @@ func evaluate():
 				if(!self.error_occur):
 					var temp = 0
 					
-					if(self.operand_1.type == BASE_type.REGISTER):
-						temp = self.registers[self.operand_1.value]
-					else:
-						temp = self.operand_1.value
-						
-					if(self.operand_2.type == BASE_type.REGISTER):
-						temp *= self.registers[self.operand_2.value]
-					else:
-						temp *= self.operand_2.value
+					temp = self.operand_1.value
+					temp *= self.operand_2.value
 					
 					self.registers[self.operand_3.value] = temp
 					emit_signal("multiply_signal")
@@ -112,15 +99,8 @@ func evaluate():
 				if(!self.error_occur):
 					var temp = 0
 					
-					if(self.operand_1.type == BASE_type.REGISTER):
-						temp = self.registers[self.operand_1.value]
-					else:
-						temp = self.operand_1.value
-						
-					if(self.operand_2.type == BASE_type.REGISTER):
-						temp /= self.registers[self.operand_2.value]
-					else:
-						temp /= self.operand_2.value
+					temp = self.operand_1.value
+					temp /= self.operand_2.value
 					
 					self.registers[self.operand_3.value] = temp
 					emit_signal("divide_signal")
@@ -158,6 +138,46 @@ func evaluate():
 				
 				if(!self.error_occur):
 					emit_signal("mine_signal")
+				
+			BR_type.LOOK:
+				
+				eat(BR_type.LOOK)
+				
+				if(!self.error_occur):
+					emit_signal("look_signal")
+				
+			BR_type.COMPARE:
+				
+				eat(BR_type.COMPARE)
+				
+				variant(operand_1)
+				variant(operand_2)
+				
+				if(!self.error_occur):
+					if(operand_1.value == operand_2.value):
+						status_register["equal"] = true
+					else:
+						status_register["equal"] = false
+					emit_signal("compare_signal")
+				
+			BR_type.JUMP:
+				
+				eat(BR_type.JUMP)
+				
+				variant(operand_1)
+				
+				if(!self.error_occur):
+					emit_signal("jump_signal", operand_1.value)
+				
+			BR_type.JUMP_EQUAL:
+				
+				eat(BR_type.JUMP_EQUAL)
+				
+				variant(operand_1)
+				
+				if(self.status_register["equal"]):
+					if(!self.error_occur):
+						emit_signal("jump_signal", operand_1.value)
 	else:
 		error("bad instruction")
 	
@@ -211,17 +231,29 @@ func get_next_token():
 			self.current_token = Token.new(BR_type.ROTATE, null)
 			return
 			
+		"look":
+			advance()
+			self.current_token = Token.new(BR_type.LOOK, null)
+			return
+			
+		"cmp":
+			advance()
+			self.current_token = Token.new(BR_type.COMPARE, null)
+			return
+			
+		"jmp":
+			advance()
+			self.current_token = Token.new(BR_type.JUMP, null)
+			return
+			
+		"je":
+			advance()
+			self.current_token = Token.new(BR_type.JUMP_EQUAL, null)
+			return
+			
 	if(self.cur_lexeme in direction_names):
 		advance()
 		self.current_token = Token.new(BR_type.DIRECTION, self.cur_lexeme)
 		return
 		
 	pass
-
-func _ready():
-	pass
-
-#func _process(delta):
-#	# Called every frame. Delta is time since last frame.
-#	# Update game logic here.
-#	pass
