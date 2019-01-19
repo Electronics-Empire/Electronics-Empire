@@ -3,6 +3,7 @@ extends Node
 enum BASE_type{
 	INTEGER,
 	REGISTER,
+	STRING,
 	EOF
 }
 
@@ -22,6 +23,8 @@ var error_occur
 
 var register_names
 var registers
+
+var status_register = Dictionary()
 
 class Token:
 	var type
@@ -74,32 +77,28 @@ func get_next_token():
 	
 	if self.cur_lexeme in self.register_names:
 		advance()
-		self.current_token = Token.new(BASE_type.REGISTER, cur_lexeme)
+		self.current_token = Token.new(BASE_type.REGISTER, self.register_names[cur_lexeme])
+		return
+		
+	if(self.cur_lexeme.begins_with("\"") and self.cur_lexeme.ends_with("\"")):
+		self.cur_lexeme = line[pos]
+		advance()
+		self.cur_lexeme.erase(0, 1)
+		self.cur_lexeme.erase(self.cur_lexeme.length()-1, 1)
+		self.current_token = Token.new(BASE_type.STRING, self.cur_lexeme)
 		return
 
-# function for instruction with form INST REG/INT REG/INT REG
-func inst_2V_1R():
-	self.operand_1 = self.current_token
+func variant(operand):
+	operand = self.current_token
 	if(operand_1.type == BASE_type.INTEGER):
 		eat(BASE_type.INTEGER)
 	else:
 		eat(BASE_type.REGISTER)
-	
-	self.operand_2 = self.current_token
-	if(operand_2.type == BASE_type.INTEGER):
-		eat(BASE_type.INTEGER)
-	else:
-		eat(BASE_type.REGISTER)
+
+# function for instruction with form INST REG/INT REG/INT REG
+func inst_2V_1R():
+	variant(self.operand_1)
+	variant(self.operand_2)
 	
 	self.operand_3 = self.current_token
 	eat(BASE_type.REGISTER)
-
-func _ready():
-	# Called when the node is added to the scene for the first time.
-	# Initialization here
-	pass
-
-#func _process(delta):
-#	# Called every frame. Delta is time since last frame.
-#	# Update game logic here.
-#	pass

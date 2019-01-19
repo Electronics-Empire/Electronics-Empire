@@ -6,7 +6,7 @@
 [ext_resource path="res://Script/buildingCamera.gd" type="Script" id=4]
 [ext_resource path="res://Scene/GUI.tscn" type="PackedScene" id=5]
 
-[node name="Game" type="Node" index="0"]
+[node name="Game" type="Node"]
 
 script = ExtResource( 1 )
 
@@ -47,7 +47,7 @@ position = Vector2( 512.621, 299.8 )
 anchor_mode = 1
 rotating = false
 current = true
-zoom = Vector2( 1, 1 )
+zoom = Vector2( 1.5, 1.5 )
 limit_left = -10000000
 limit_top = -10000000
 limit_right = 10000000
