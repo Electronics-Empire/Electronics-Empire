@@ -1,6 +1,6 @@
 extends Node
 
-var unit_list = Array()
+var unit_list = Dictionary()
 var ressource_dict = Dictionary()
 var lg401_module
 var id
@@ -36,9 +36,26 @@ sync func send_line(text):
 
 remote func ask_player_sync():
 	rpc("player_sync", self.id)
+	
+	for id in self.unit_list:
+		var unit = get_node(unit_list[id])
+		rpc("unit_sync", unit.id, unit.entity_name)
 	pass
 
-remote func player_sync():
+remote func unit_sync(id, entity_name):
+	var unit
+	if(!unit_list.has(id)):
+		match(entity_name):
+			"BR100":
+				unit = br100_module_scene.instance()
+		unit.set_name(str(id))
+		add_child(unit)
+		self.unit_list[id] = unit.get_path()
+		unit.rpc_id(1, "ask_entity_sync")
+	pass
+
+remote func player_sync(id):
+	self.id = id
 	if(!has_node("LG401_module")):
 		self.lg401_module = load("res://Scene/LG401_module.tscn").instance()
 		
@@ -47,7 +64,7 @@ remote func player_sync():
 		lg401_module.connect("build_signal", self, "load_code")
 		
 		add_child(self.lg401_module)
-		self.lg401_module.rpc_id(1,"__ask_entity_sync__")
+		self.lg401_module.rpc_id(1,"ask_entity_sync")
 	pass
 
 func add_ressource(ressource, num):
@@ -64,7 +81,7 @@ func load_code(file_path, unit_type, init_position):
 	if(self.id == get_tree().get_network_unique_id()):
 		var file = File.new()
 		if(file.open("game_script/" + file_path, file.READ) == OK):
-			var code_array = Array()
+			var code_array = PoolStringArray()
 			while(!file.eof_reached()):
 				code_array.append(file.get_line())
 			rpc("create_unit", code_array, unit_type, init_position)
@@ -77,11 +94,13 @@ sync func create_unit(code_array, unit_type, init_position):
 			unit = br100_module_scene.instance()
 	
 	unit.code = code_array
+	
+	unit.set_name(str(unit_id_iterator))
 	add_child(unit)
 	unit.set_position(init_position)
 	
 	unit.id = unit_id_iterator
-	unit_list.insert(unit_id_iterator, unit.get_path())
+	unit_list[unit_id_iterator] = unit.get_path()
 	unit_id_iterator += 1
 	
 	unit.send_line()

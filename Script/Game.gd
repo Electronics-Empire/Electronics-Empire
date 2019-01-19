@@ -13,6 +13,8 @@ var carbon_counter
 
 var object_pos = Array()
 var object_array = Array()
+var player_ready = Dictionary()
+var player_ok = Dictionary()
 
 # generate all the objects
 func __generate_object__():
@@ -48,8 +50,9 @@ remote func generate_player(id):
 	random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
 	init_pos = Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2)
 	
-	while(self.world.get_cell((init_pos.x/self.globals.tileSize.x), (init_pos.y/self.globals.tileSize.y)) == self.world.water
-		  || self.world.get_cell((init_pos.x/self.globals.tileSize.x), (init_pos.y/self.globals.tileSize.y)) == self.world.border):
+	while( (self.world.get_cell((init_pos.x/self.globals.tileSize.x), (init_pos.y/self.globals.tileSize.y)) == self.world.water
+		  or self.world.get_cell((init_pos.x/self.globals.tileSize.x), (init_pos.y/self.globals.tileSize.y)) == self.world.border)
+		  and object_pos.find(Vector2(random_x_location, random_y_location)) == -1 ):
 		random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
 		random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
 		init_pos = Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2)
@@ -68,12 +71,34 @@ remote func generate_player(id):
 func dead_player(id):
 	get_node(str(id)).queue_free()
 	self.network_info.player_list.erase(str(id))
+	player_ready.erase(id)
+	player_ok.erase(id)
+	pass
+
+func __wait_player__():
+	if(player_ready.hash() == player_ok.hash()):
+		rpc("continue_all")
+	pass
+
+remote func player_ready(id):
+	player_ready[id] = true
+	__wait_player__()
+	pass
+
+func __reset_player__():
+	for id in player_ready:
+		player_ready[id] = false
+	pass
+
+func __add_player__(id):
+	player_ready[id] = false
+	player_ok[id] = true
 	pass
 
 remote func ask_sync_player():
 	for player in self.network_info.player_list:
 		rpc("sync_player", player)
-	rpc("continue_all")
+	rpc("finished_sync")
 	pass
 
 remote func sync_player(player):
@@ -88,10 +113,13 @@ remote func sync_player(player):
 		new_player.rpc_id(1,"ask_player_sync")
 	pass
 
+remote func finished_sync():
+	rpc_id(1, "player_ready", get_tree().get_network_unique_id())
+	pass
+
 remote func ask_sync_object():
 	for object in object_array:
 		if(object.get_filename() == self.carbon_obj.get_path()):
-			print("allo")
 			rpc("sync_carbon", object.position.x, object.position.y)
 	pass
 
@@ -142,7 +170,10 @@ func add_ressource(ressource, num):
 
 # function is call on the server and client when a new peer is connected
 func new_peer(id):
-	print("network working!")
+	if(get_tree().is_network_server()):
+		__add_player__(id)
+		__reset_player__()
+		rpc("pause_all")
 	pass
 
 # function is call on the server and client when a peer disconnected
@@ -152,11 +183,10 @@ func peer_left(id):
 
 # function is call on the client when a new peer is connected
 func player_connection():
-	rpc("pause_all")
 	rpc_id(1, "generate_player", get_tree().get_network_unique_id())
 	self.world.rpc_id(1,"__ask_sync_world__")
-	rpc_id(1,"ask_sync_player")
 	rpc_id(1, "ask_sync_object")
+	rpc_id(1,"ask_sync_player")
 	pass
 
 # function is call on the client when a peer failed to connect

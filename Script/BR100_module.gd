@@ -25,25 +25,26 @@ var entity_name
 var orientation
 var damage
 
-var code
+var code = PoolStringArray()
 var code_pos
 var id
-
-var active
 
 signal add_ressource_signal
 signal unit_dead_signal
 
 remote func ask_entity_sync():
-	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation)
+	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation, self.code_pos, self.code )
 	pass
 
-remote func entity_sync(animation, frame, pos, health, orientation):
+remote func entity_sync(animation, frame, pos, health, orientation, code_pos, code, time):
 	self.sprite.animation = animation
 	self.sprite.frame = frame
 	self.position = pos
 	self.health_bar.value = health
 	self.orientation = orientation
+	self.code_pos = code_pos
+	self.code = code
+	send_line()
 	pass
 
 
