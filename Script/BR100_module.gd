@@ -1,13 +1,12 @@
 extends "unit_entity.gd"
 
 func _ready():
+	._ready()
 	
-	self.clock_time = 1
+	self.clock_time = 3
 	self.max_health = 100
 	self.damage = 50
 	self.entity_name = "BR100"
-	
-	._ready()
 	
 	self.clock.set_wait_time(self.clock_time)
 	self.health_bar.max_value = self.max_health

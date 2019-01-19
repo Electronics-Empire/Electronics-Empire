@@ -38,29 +38,15 @@ remote func entity_sync(animation, frame, pos, health, orientation):
 
 func walk(count):
 	if(count):
-		match(self.orientation):
-			DIRECTION.north:
-				__walk__(Vector2(0,-globals.tileSize.y), count)
-			DIRECTION.south:
-				__walk__(Vector2(0,globals.tileSize.y), count)
-			DIRECTION.east:
-				__walk__(Vector2(globals.tileSize.x,0), count)
-			DIRECTION.west:
-				__walk__(Vector2(-globals.tileSize.x, 0), count)
+		if(!self.ray_cast.is_colliding()):
+			self.movement.interpolate_property(self, "position", self.position, self.position + self.ray_cast.cast_to, 1, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
+			self.movement.interpolate_callback(self, self.movement.get_runtime(), "walk", count-1)
+			self.movement.start()
+		else:
+			__reset_active__()
 	else:
 		__reset_active__()
 	pass
-
-func __walk__(dest, count):
-	self.ray_cast.cast_to = dest
-	self.ray_cast.force_raycast_update()
-	
-	if(!self.ray_cast.is_colliding()):
-		self.movement.interpolate_property(self, "position", self.position, self.position+dest, 1, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
-		self.movement.interpolate_callback(self, self.movement.get_runtime(), "walk", count-1)
-		self.movement.start()
-	else:
-		__reset_active__()
 
 func tween_stopped():
 	__reset_active__()
@@ -86,60 +72,36 @@ func rotate(direction):
 	match(direction):
 		"north":
 			self.orientation = DIRECTION.north
+			self.ray_cast.cast_to = Vector2(0,-globals.tileSize.y)
 			sprite.play("NORTH")
 		"south":
 			self.orientation = DIRECTION.south
+			self.ray_cast.cast_to = Vector2(0,globals.tileSize.y)
 			sprite.play("SOUTH")
 		"east":
 			self.orientation = DIRECTION.east
+			self.ray_cast.cast_to = Vector2(globals.tileSize.x,0)
 			sprite.play("EAST")
 		"west":
 			self.orientation = DIRECTION.west
+			self.ray_cast.cast_to = Vector2(-globals.tileSize.x,0)
 			sprite.play("WEST")
+	self.ray_cast.force_raycast_update()
 	__reset_active__()
 	pass
 
 func attack():
-	match(self.orientation):
-		DIRECTION.north:
-			__attack__(Vector2(0,-globals.tileSize.y))
-		DIRECTION.south:
-			__attack__(Vector2(0,globals.tileSize.y))
-		DIRECTION.east:
-			__attack__(Vector2(globals.tileSize.x,0))
-		DIRECTION.west:
-			__attack__(Vector2(-globals.tileSize.x,0))
-	__reset_active__()
-	pass
-
-func __attack__(dest):
-	self.ray_cast.cast_to = dest
-	self.ray_cast.force_raycast_update()
-	
 	if(self.ray_cast.is_colliding()):
 		var obj = self.ray_cast.get_collider()
 		if(obj is KinematicBody2D):
 			obj.__receive_damage__(self.damage)
-
-func build(file_path, unit_type):
-	match(self.orientation):
-		DIRECTION.north:
-			__build__(Vector2(0,-globals.tileSize.y), file_path, unit_type)
-		DIRECTION.south:
-			__build__(Vector2(0,globals.tileSize.y), file_path, unit_type)
-		DIRECTION.east:
-			__build__(Vector2(globals.tileSize.x,0), file_path, unit_type)
-		DIRECTION.west:
-			__build__(Vector2(-globals.tileSize.x,0), file_path, unit_type)
 	__reset_active__()
 	pass
 
-func __build__(dest, file_path, unit_type):
-	self.ray_cast.cast_to = dest
-	self.ray_cast.force_raycast_update()
-	
+func build(file_path, unit_type):
 	if(!self.ray_cast.is_colliding()):
-		emit_signal("build_signal", file_path, unit_type, self.position + dest)
+		emit_signal("build_signal", file_path, unit_type, self.position + self.ray_cast.cast_to)
+	__reset_active__()
 	pass
 
 func __receive_damage__(damage):
@@ -149,25 +111,11 @@ func __receive_damage__(damage):
 		self.__die__()
 
 func mine():
-	match(self.orientation):
-		DIRECTION.north:
-			__mine__(Vector2(0,-globals.tileSize.y))
-		DIRECTION.south:
-			__mine__(Vector2(0,globals.tileSize.y))
-		DIRECTION.east:
-			__mine__(Vector2(globals.tileSize.x,0))
-		DIRECTION.west:
-			__mine__(Vector2(-globals.tileSize.x,0))
-	__reset_active__()
-
-func __mine__(dest):
-	self.ray_cast.cast_to = dest
-	self.ray_cast.force_raycast_update()
-	
 	if(self.ray_cast.is_colliding()):
 		var obj = self.ray_cast.get_collider()
 		if(obj.is_in_group("Ressource")):
 			emit_signal("add_ressource_signal", obj.ressource_name, obj.mine())
+	__reset_active__()
 
 func _process(delta):
 	self.clock_bar.value = ((self.clock_time-self.clock.time_left)/self.clock_time)*100
@@ -186,6 +134,8 @@ func _ready():
 	self.sprite = get_node("AnimatedSprite")
 	self.ray_cast = get_node("Collision_checker")
 	self.health_bar = get_node("Health_bar")
+	
+	self.ray_cast.cast_to = Vector2(0,globals.tileSize.y)
 	
 	self.sprite.play("SOUTH")
 	pass

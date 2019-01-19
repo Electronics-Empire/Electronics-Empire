@@ -1,5 +1,7 @@
 extends "entity.gd"
 
+var look_area
+
 var code = PoolStringArray()
 var code_pos
 var id
@@ -51,6 +53,8 @@ func load_code(code):
 func _ready():
 	._ready()
 	self.code_pos = 0
+	
+	self.look_area = get_node("Look_area")
 	pass
 
 func __die__():

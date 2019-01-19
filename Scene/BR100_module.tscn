@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Script/BR100_module.gd" type="Script" id=1]
 [ext_resource path="res://Script/Interpreter_BR.gd" type="Script" id=2]
@@ -36,6 +36,11 @@ animations = [ {
 
 custom_solver_bias = 0.0
 extents = Vector2( 31.5814, 31.7561 )
+
+[sub_resource type="CircleShape2D" id=3]
+
+custom_solver_bias = 0.0
+radius = 157.091
 
 [node name="BR100_module" type="KinematicBody2D" index="0"]
 
@@ -133,5 +138,20 @@ exclude_parent = true
 cast_to = Vector2( 0, 50 )
 collision_mask = 1
 _sections_unfolded = [ "Transform" ]
+
+[node name="Look_area" type="Area2D" parent="." index="7"]
+
+visible = false
+input_pickable = true
+gravity_vec = Vector2( 0, 1 )
+gravity = 98.0
+linear_damp = 0.1
+angular_damp = 1.0
+audio_bus_override = false
+audio_bus_name = "Master"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Look_area" index="0"]
+
+shape = SubResource( 3 )
 
 

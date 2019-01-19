@@ -28,12 +28,12 @@ sync func send_line(text):
 	pass
 
 func _ready():
-	self.clock_time = 3
+	._ready()
+	
+	self.clock_time = 10
 	self.max_health = 100
 	self.damage = 50
 	self.entity_name = "LG401"
-	
-	._ready()
 	
 	self.clock.set_wait_time(self.clock_time)
 	self.health_bar.max_value = self.max_health

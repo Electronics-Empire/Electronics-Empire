@@ -6,6 +6,7 @@ var lg401_module
 var id
 var unit_id_iterator = 0
 
+onready var globals = get_node("/root/globals")
 onready var br100_module_scene = load("res://Scene/BR100_module.tscn")
 
 signal add_ressource_signal
@@ -24,6 +25,8 @@ func generate_lg401(init_pos_vector):
 	
 	module.set_position(init_pos_vector)
 	self.lg401_module = module
+	
+	ressource_dict = {"carbon" : 5}
 	pass
 
 func player_die():
@@ -35,7 +38,7 @@ sync func send_line(text):
 	pass
 
 remote func ask_player_sync():
-	rpc("player_sync", self.id)
+	rpc("player_sync", self.id, self.ressource_dict)
 	
 	for id in self.unit_list:
 		var unit = get_node(unit_list[id])
@@ -54,8 +57,9 @@ remote func unit_sync(id, entity_name):
 		unit.rpc_id(1, "ask_entity_sync")
 	pass
 
-remote func player_sync(id):
+remote func player_sync(id, ressource_dict):
 	self.id = id
+	self.ressource_dict = ressource_dict
 	if(!has_node("LG401_module")):
 		self.lg401_module = load("res://Scene/LG401_module.tscn").instance()
 		
@@ -89,27 +93,37 @@ func load_code(file_path, unit_type, init_position):
 
 sync func create_unit(code_array, unit_type, init_position):
 	var unit
-	match(unit_type):
-		"BR100":
-			unit = br100_module_scene.instance()
-	
-	unit.code = code_array
-	
-	unit.set_name(str(unit_id_iterator))
-	add_child(unit)
-	unit.set_position(init_position)
-	
-	unit.id = unit_id_iterator
-	unit_list[unit_id_iterator] = unit.get_path()
-	unit_id_iterator += 1
-	
-	unit.send_line()
+	if(__eat_ressource__(unit_type)):
+		match(unit_type):
+			"BR100":
+				unit = br100_module_scene.instance()
+		
+		unit.code = code_array
+		
+		unit.set_name(str(unit_id_iterator))
+		add_child(unit)
+		unit.set_position(init_position)
+		
+		unit.id = unit_id_iterator
+		unit_list[unit_id_iterator] = unit.get_path()
+		unit_id_iterator += 1
+		
+		unit.send_line()
 		
 	pass
 
-
-
-#func _process(delta):
-#	# Called every frame. Delta is time since last frame.
-#	# Update game logic here.
-#	pass
+func __eat_ressource__(unit_type):
+	var ressources_cost = self.globals.ressource_cost[unit_type]
+	for ressource in ressources_cost:
+		if(!ressource_dict.has(ressource)):
+			return false
+		elif(ressource_dict[ressource] < ressources_cost[ressource]):
+			return false
+	
+	for ressource in ressources_cost:
+		ressource_dict[ressource] -= ressources_cost[ressource]
+		if(id == get_tree().get_network_unique_id()):
+			emit_signal("add_ressource_signal", ressource, ressource_dict[ressource])
+	
+	return true
+	pass
