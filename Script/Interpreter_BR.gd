@@ -35,6 +35,9 @@ func _init():
 	self.direction_names = PoolStringArray(["north", "south", "east", "west"])
 	self.registers = {"x":0, "y":0, "a":0}
 	self.status_register = {"equal" : false}
+	
+	self.maxInt = 9999
+	self.minInt = -9999
 	pass
 
 func evaluate():
@@ -228,7 +231,7 @@ func get_next_token():
 			
 		"mine":
 			advance()
-			self.current_token = Token.new(BR_type.ROTATE, null)
+			self.current_token = Token.new(BR_type.MINE, null)
 			return
 			
 		"look":

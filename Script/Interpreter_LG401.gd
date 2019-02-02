@@ -23,6 +23,9 @@ func _init():
 	self.register_names = PoolStringArray()
 	self.direction_names = PoolStringArray(["north", "south", "east", "west"])
 	self.registers = {}
+	
+	self.maxInt = 9999
+	self.minInt = -9999
 	pass
 
 func evaluate():
