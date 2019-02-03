@@ -1,6 +1,6 @@
 extends "res://addons/gut/test.gd"
 
-var interpreter = load("res://Script/Interpreter_LG401.gd").new()
+var interpreter
 var operand1
 var operand2
 

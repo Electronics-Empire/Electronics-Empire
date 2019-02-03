@@ -10,6 +10,7 @@ func after_each():
 
 func before_all():
 	randomize()
+	interpreter = load("res://Script/Interpreter_LG401.gd").new()
 
 func after_all():
 	pass

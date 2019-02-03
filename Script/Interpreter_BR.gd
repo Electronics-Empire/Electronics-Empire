@@ -153,8 +153,11 @@ func evaluate():
 				
 				eat(BR_type.COMPARE)
 				
-				variant(operand_1)
-				variant(operand_2)
+				self.operand_1 = self.current_token
+				variant(self.operand_1)
+				
+				self.operand_2 = self.current_token
+				variant(self.operand_2)
 				
 				if(!self.error_occur):
 					if(operand_1.value == operand_2.value):
@@ -167,7 +170,8 @@ func evaluate():
 				
 				eat(BR_type.JUMP)
 				
-				variant(operand_1)
+				self.operand_1 = self.current_token
+				variant(self.operand_1)
 				
 				if(!self.error_occur):
 					emit_signal("jump_signal", operand_1.value)
@@ -176,7 +180,8 @@ func evaluate():
 				
 				eat(BR_type.JUMP_EQUAL)
 				
-				variant(operand_1)
+				self.operand_1 = self.current_token
+				variant(self.operand_1)
 				
 				if(self.status_register["equal"]):
 					if(!self.error_occur):
