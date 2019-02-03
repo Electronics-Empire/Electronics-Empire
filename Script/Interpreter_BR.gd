@@ -35,6 +35,9 @@ func _init():
 	self.direction_names = PoolStringArray(["north", "south", "east", "west"])
 	self.registers = {"x":0, "y":0, "a":0}
 	self.status_register = {"equal" : false}
+	
+	self.maxInt = 9999
+	self.minInt = -9999
 	pass
 
 func evaluate():
@@ -150,8 +153,11 @@ func evaluate():
 				
 				eat(BR_type.COMPARE)
 				
-				variant(operand_1)
-				variant(operand_2)
+				self.operand_1 = self.current_token
+				variant(self.operand_1)
+				
+				self.operand_2 = self.current_token
+				variant(self.operand_2)
 				
 				if(!self.error_occur):
 					if(operand_1.value == operand_2.value):
@@ -164,7 +170,8 @@ func evaluate():
 				
 				eat(BR_type.JUMP)
 				
-				variant(operand_1)
+				self.operand_1 = self.current_token
+				variant(self.operand_1)
 				
 				if(!self.error_occur):
 					emit_signal("jump_signal", operand_1.value)
@@ -173,7 +180,8 @@ func evaluate():
 				
 				eat(BR_type.JUMP_EQUAL)
 				
-				variant(operand_1)
+				self.operand_1 = self.current_token
+				variant(self.operand_1)
 				
 				if(self.status_register["equal"]):
 					if(!self.error_occur):
@@ -228,7 +236,7 @@ func get_next_token():
 			
 		"mine":
 			advance()
-			self.current_token = Token.new(BR_type.ROTATE, null)
+			self.current_token = Token.new(BR_type.MINE, null)
 			return
 			
 		"look":

@@ -25,6 +25,8 @@ var register_names
 var registers
 
 var status_register = Dictionary()
+var maxInt
+var minInt
 
 class Token:
 	var type
@@ -72,12 +74,15 @@ func get_next_token():
 	
 	if self.cur_lexeme.is_valid_integer():
 		advance()
-		self.current_token = Token.new(BASE_type.INTEGER, int(cur_lexeme))
+		var integer = int(cur_lexeme)
+		if(integer > maxInt or integer < minInt):
+			integer = 0
+		self.current_token = Token.new(BASE_type.INTEGER, integer)
 		return
 	
 	if self.cur_lexeme in self.register_names:
 		advance()
-		self.current_token = Token.new(BASE_type.REGISTER, self.register_names[cur_lexeme])
+		self.current_token = Token.new(BASE_type.REGISTER, cur_lexeme)
 		return
 		
 	if(self.cur_lexeme.begins_with("\"") and self.cur_lexeme.ends_with("\"")):
@@ -89,15 +94,17 @@ func get_next_token():
 		return
 
 func variant(operand):
-	operand = self.current_token
-	if(operand_1.type == BASE_type.INTEGER):
+	if(operand.type == BASE_type.INTEGER):
 		eat(BASE_type.INTEGER)
 	else:
 		eat(BASE_type.REGISTER)
 
 # function for instruction with form INST REG/INT REG/INT REG
 func inst_2V_1R():
+	self.operand_1 = self.current_token
 	variant(self.operand_1)
+	
+	self.operand_2 = self.current_token
 	variant(self.operand_2)
 	
 	self.operand_3 = self.current_token
