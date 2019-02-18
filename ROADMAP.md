@@ -12,3 +12,9 @@
 0.2(unit & ressource):
 - first unit
 - basic ressource
+
+0.3(GUI & tech tree):
+- GUI to show registers state
+- GUI to show code
+- add two new BR unit
+- add a tech tree
