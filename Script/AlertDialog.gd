@@ -1,11 +1,11 @@
 extends AcceptDialog
 
-func __show_dialog__(text):
+func show_dialog(text):
 	self.dialog_text = text
 	self.show()
 	pass
 
-func __close_dialog__():
+func close_dialog():
 	self.hide()
 	pass
 

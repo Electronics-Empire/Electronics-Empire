@@ -2,12 +2,12 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/LG401_module_UP.png-683f8891eb347ed0358a56e9ca3bee77.stex"
+path="res://.import/icon.png-91b084043b8aaf2f1c906e7b9fa92969.stex"
 
 [deps]
 
-source_file="res://ObjectTile/LG401_module_UP.png"
-dest_files=[ "res://.import/LG401_module_UP.png-683f8891eb347ed0358a56e9ca3bee77.stex" ]
+source_file="res://addons/gut/icon.png"
+dest_files=[ "res://.import/icon.png-91b084043b8aaf2f1c906e7b9fa92969.stex" ]
 
 [params]
 

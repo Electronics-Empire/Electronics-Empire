@@ -8,20 +8,21 @@
 [sub_resource type="RectangleShape2D" id=1]
 
 custom_solver_bias = 0.0
-extents = Vector2( 13, 13 )
+extents = Vector2( 26.0063, 25.9564 )
 
 [sub_resource type="RectangleShape2D" id=2]
 
 custom_solver_bias = 0.0
-extents = Vector2( 16, 16 )
+extents = Vector2( 31.8685, 31.9585 )
 
 [node name="TileSet" type="Node"]
 
 [node name="Water" type="Sprite" parent="." index="0"]
 
 visible = false
-position = Vector2( 16, 16 )
+position = Vector2( 32, 32 )
 texture = ExtResource( 1 )
+_sections_unfolded = [ "Transform" ]
 
 [node name="Area2D" type="StaticBody2D" parent="Water" index="0"]
 
@@ -38,15 +39,16 @@ _sections_unfolded = [ "Collision" ]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Water/Area2D" index="0"]
 
-position = Vector2( 9.53674e-07, 0 )
-scale = Vector2( 2.46154, 2.46154 )
+position = Vector2( 9.53674e-07, 0.419828 )
+scale = Vector2( 2.46154, 2.47622 )
 shape = SubResource( 1 )
 
 [node name="Grass" type="Sprite" parent="." index="1"]
 
 visible = false
-position = Vector2( 16, 16 )
+position = Vector2( 32, 32 )
 texture = ExtResource( 2 )
+_sections_unfolded = [ "Animation", "Offset", "Region", "Transform" ]
 
 [node name="Area2D" type="Area2D" parent="Grass" index="0"]
 
@@ -58,18 +60,21 @@ linear_damp = 0.1
 angular_damp = 1.0
 audio_bus_override = false
 audio_bus_name = "Master"
+_sections_unfolded = [ "Audio Bus", "Collision", "Transform", "Z Index" ]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Grass/Area2D" index="0"]
 
 position = Vector2( 9.53674e-07, 0 )
 scale = Vector2( 2.46154, 2.46154 )
 shape = SubResource( 1 )
+_sections_unfolded = [ "Transform", "Z Index" ]
 
 [node name="Dirt" type="Sprite" parent="." index="2"]
 
 visible = false
-position = Vector2( 16, 16 )
+position = Vector2( 32, 32 )
 texture = ExtResource( 3 )
+_sections_unfolded = [ "Transform" ]
 
 [node name="Area2D" type="Area2D" parent="Dirt" index="0"]
 
@@ -92,13 +97,12 @@ shape = SubResource( 1 )
 [node name="Border" type="Sprite" parent="." index="3"]
 
 visible = false
-position = Vector2( 16, 16 )
+position = Vector2( 32, 32 )
 texture = ExtResource( 4 )
 _sections_unfolded = [ "Offset", "Transform", "Z Index" ]
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Border" index="0"]
 
-visible = false
 input_pickable = false
 collision_layer = 1
 collision_mask = 1

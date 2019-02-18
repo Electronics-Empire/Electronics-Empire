@@ -2,12 +2,12 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/LG401_module_DOWN.png-c5cc9957c99a391f6b7e29ba7ad3c8e8.stex"
+path="res://.import/BR_100_LEFT.png-d87c13c77726b3a05e41998b9e73245e.stex"
 
 [deps]
 
-source_file="res://ObjectTile/LG401_module_DOWN.png"
-dest_files=[ "res://.import/LG401_module_DOWN.png-c5cc9957c99a391f6b7e29ba7ad3c8e8.stex" ]
+source_file="res://ObjectTile/BR_100_LEFT.png"
+dest_files=[ "res://.import/BR_100_LEFT.png-d87c13c77726b3a05e41998b9e73245e.stex" ]
 
 [params]
 

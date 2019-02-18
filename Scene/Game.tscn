@@ -6,7 +6,7 @@
 [ext_resource path="res://Script/buildingCamera.gd" type="Script" id=4]
 [ext_resource path="res://Scene/GUI.tscn" type="PackedScene" id=5]
 
-[node name="Game" type="Node" index="0"]
+[node name="Game" type="Node"]
 
 script = ExtResource( 1 )
 
@@ -14,7 +14,7 @@ script = ExtResource( 1 )
 
 mode = 0
 tile_set = ExtResource( 2 )
-cell_size = Vector2( 32, 32 )
+cell_size = Vector2( 64, 64 )
 cell_quadrant_size = 16
 cell_custom_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
 cell_half_offset = 2
@@ -47,7 +47,7 @@ position = Vector2( 512.621, 299.8 )
 anchor_mode = 1
 rotating = false
 current = true
-zoom = Vector2( 1, 1 )
+zoom = Vector2( 1.5, 1.5 )
 limit_left = -10000000
 limit_top = -10000000
 limit_right = 10000000
@@ -70,10 +70,5 @@ script = ExtResource( 4 )
 _sections_unfolded = [ "Drag Margin", "Editor", "Limit", "Offset", "Smoothing" ]
 
 [node name="GUI" parent="Camera2D" index="0" instance=ExtResource( 5 )]
-
-margin_left = -512.0
-margin_top = -291.0
-margin_right = 511.0
-margin_bottom = -167.0
 
 

@@ -1,12 +1,12 @@
 extends "Interpreter_base.gd"
 
 enum LG401_type{
-	PLUS,
-	MINUS,
 	WALK,
 	ATTACK,
 	ROTATE,
-	DIRECTION
+	DIRECTION,
+	MINE,
+	BUILD
 }
 
 signal walk_signal
@@ -14,13 +14,18 @@ signal add_signal
 signal sub_signal
 signal attack_signal
 signal rotate_signal
+signal mine_signal
+signal build_signal
 
 var direction_names
 
 func _init():
-	self.register_names = PoolStringArray(["x"])
+	self.register_names = PoolStringArray()
 	self.direction_names = PoolStringArray(["north", "south", "east", "west"])
-	self.registers = {"x":0}
+	self.registers = {}
+	
+	self.maxInt = 9999
+	self.minInt = -9999
 	pass
 
 func evaluate():
@@ -30,51 +35,6 @@ func evaluate():
 	
 	if(instruction != null):
 		match(instruction.type):
-			
-			LG401_type.PLUS:
-				
-				eat(LG401_type.PLUS)
-				
-				inst_2V_1R()
-				
-				if(!self.error_occur):
-					var temp = 0
-					
-					if(self.operand_1.type == BASE_type.REGISTER):
-						temp = self.registers[self.operand_1.value]
-					else:
-						temp = self.operand_1.value
-						
-					if(self.operand_2.type == BASE_type.REGISTER):
-						temp += self.registers[self.operand_2.value]
-					else:
-						temp += self.operand_2.value
-					
-					self.registers[self.operand_3.value] = temp
-					emit_signal("add_signal")
-				
-			LG401_type.MINUS:
-				
-				eat(LG401_type.MINUS)
-				
-				inst_2V_1R()
-				
-				if(!self.error_occur):
-					var temp = 0
-					
-					if(self.operand_1.type == BASE_type.REGISTER):
-						temp = self.registers[self.operand_1.value]
-					else:
-						temp = self.operand_1.value
-						
-					if(self.operand_2.type == BASE_type.REGISTER):
-						temp -= self.registers[self.operand_2.value]
-					else:
-						temp -= self.operand_2.value
-					
-					self.registers[self.operand_3.value] = temp
-					emit_signal("sub_signal")
-				
 			LG401_type.WALK:
 				
 				eat(LG401_type.WALK)
@@ -101,6 +61,26 @@ func evaluate():
 				
 				if(!self.error_occur):
 					emit_signal("rotate_signal",operand_1.value)
+				
+			LG401_type.MINE:
+				
+				eat(LG401_type.MINE)
+				
+				if(!self.error_occur):
+					emit_signal("mine_signal")
+				
+			LG401_type.BUILD:
+				
+				eat(LG401_type.BUILD)
+				
+				self.operand_1 = self.current_token
+				eat(BASE_type.STRING)
+				
+				self.operand_2 = self.current_token
+				eat(BASE_type.STRING)
+				
+				if(!self.error_occur):
+					emit_signal("build_signal", operand_1.value, operand_2.value)
 	else:
 		error("bad instruction")
 	
@@ -114,29 +94,29 @@ func get_next_token():
 		return
 	
 	match(self.cur_lexeme):
-		"add":
-			advance()
-			self.current_token = Token.new(LG401_type.PLUS, null)
-			return
-			
-		"sub":
-			advance()
-			self.current_token = Token.new(LG401_type.MINUS, null)
-			return
-			
 		"walk":
 			advance()
 			self.current_token = Token.new(LG401_type.WALK, null)
 			return
 			
-		"attack":
+		"att":
 			advance()
 			self.current_token = Token.new(LG401_type.ATTACK, null)
 			return
 			
-		"rotate":
+		"rot":
 			advance()
 			self.current_token = Token.new(LG401_type.ROTATE, null)
+			return
+			
+		"mine":
+			advance()
+			self.current_token = Token.new(LG401_type.MINE, null)
+			return
+			
+		"bld":
+			advance()
+			self.current_token = Token.new(LG401_type.BUILD, null)
 			return
 			
 	if(self.cur_lexeme in direction_names):
