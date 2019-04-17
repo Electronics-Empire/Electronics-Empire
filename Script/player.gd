@@ -11,6 +11,7 @@ onready var br100_module_scene = load("res://Scene/BR100_module.tscn")
 
 signal add_ressource_signal
 signal dead_signal
+signal set_target_signal
 
 func _ready():
 	pass
@@ -22,6 +23,7 @@ func generate_lg401(init_pos_vector):
 	module.connect("dead_signal", self, "player_die")
 	module.connect("add_ressource_signal", self, "add_ressource")
 	module.connect("build_signal", self, "load_code")
+	module.connect("set_target_signal", self, "set_target")
 	
 	module.set_position(init_pos_vector)
 	self.lg401_module = module
@@ -32,6 +34,10 @@ func generate_lg401(init_pos_vector):
 
 func player_die():
 	emit_signal("dead_signal", self.id)
+	pass
+
+func set_target(target):
+	emit_signal("set_target_signal", target)
 	pass
 
 sync func send_line(text):
@@ -52,6 +58,8 @@ remote func unit_sync(id, entity_name):
 		unit = __instance_by_name__(entity_name)
 		unit.set_name(str(id))
 		add_child(unit)
+		unit.connect("set_target_signal", self, "set_target")
+		
 		self.unit_list[id] = unit.get_path()
 		unit.rpc_id(1, "ask_entity_sync")
 	pass
@@ -66,6 +74,7 @@ remote func player_sync(id, unit_id_iterator, ressource_dict):
 		lg401_module.connect("add_ressource_signal", self, "add_ressource")
 		lg401_module.connect("dead_signal", self, "player_die")
 		lg401_module.connect("build_signal", self, "load_code")
+		lg401_module.connect("set_target_signal", self, "set_target")
 		
 		add_child(self.lg401_module)
 		self.lg401_module.rpc_id(1,"ask_entity_sync")
@@ -100,6 +109,8 @@ sync func create_unit(code_array, unit_type, init_position):
 		unit.set_name(str(unit_id_iterator))
 		add_child(unit)
 		unit.set_position(init_position)
+		
+		unit.connect("set_target_signal", self, "set_target")
 		
 		unit.owner_id = self.id
 		

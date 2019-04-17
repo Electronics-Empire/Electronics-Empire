@@ -6,6 +6,7 @@ var globals
 var alert_dialog
 var network_info
 var ctrl_global
+var info
 
 var carbon_obj
 
@@ -63,6 +64,7 @@ remote func generate_player(id):
   
 	player.connect("add_ressource_signal", self, "add_ressource")
 	player.connect("dead_signal", self, "dead_player")
+	player.connect("set_target_signal", self, "set_target")
   
 	self.object_pos.append(init_pos)
 	self.network_info.player_list.append(str(id))
@@ -80,7 +82,7 @@ func __wait_player__():
 		rpc("continue_all")
 	pass
 
-remote func player_ready(id):
+remote func send_player_ready(id):
 	player_ready[id] = true
 	__wait_player__()
 	pass
@@ -108,13 +110,14 @@ remote func sync_player(player):
 		add_child(new_player)
 		
 		new_player.connect("add_ressource_signal", self, "add_ressource")
+		new_player.connect("set_target_signal", self, "set_target")
 		new_player.connect("dead_signal", self, "dead_player")
 		
 		new_player.rpc_id(1,"ask_player_sync")
 	pass
 
 remote func finished_sync():
-	rpc_id(1, "player_ready", get_tree().get_network_unique_id())
+	rpc_id(1, "send_player_ready", get_tree().get_network_unique_id())
 	pass
 
 remote func ask_sync_object():
@@ -158,15 +161,19 @@ func generation_finished():
 	pass
 
 # send a line when we click on the execute button
-func execute_button(text):
+func on_execute_button(text):
 	self.get_node(str(get_tree().get_network_unique_id())).rpc("send_line",text)
 	pass
 
 func add_ressource(ressource, num):
 	match(ressource):
 		"carbon":
-			self.carbon_counter.set_carbon(num)
+			pass
+			#self.carbon_counter.set_carbon(num)
 	pass
+
+func set_target(target):
+	self.info.set_target(target)
 
 # function is call on the server and client when a new peer is connected
 func new_peer(id):
@@ -209,8 +216,9 @@ func _ready():
 	self.carbon_obj = load("res://Scene/Carbon.tscn")
 	
 	self.carbon_counter = get_node("Camera2D/GUI/PanelGUI/Carbon_counter")
+	self.info = get_node("Camera2D/GUI/PanelGUI/Info")
 	
-	self.execute_button.connect("button_pressed_signal", self, "execute_button")
+	self.execute_button.connect("button_pressed_signal", self, "on_execute_button")
 	self.world.connect("Generation_finished_signal", self, "generation_finished")
 	get_tree().connect("network_peer_connected", self, "new_peer")
 	get_tree().connect("network_peer_disconnected", self, "peer_left")

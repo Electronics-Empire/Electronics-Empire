@@ -7,68 +7,26 @@
 [ext_resource path="res://Scene/GUI.tscn" type="PackedScene" id=5]
 
 [node name="Game" type="Node"]
-
 script = ExtResource( 1 )
 
-[node name="World" type="TileMap" parent="." index="0"]
-
-mode = 0
+[node name="World" type="TileMap" parent="."]
 tile_set = ExtResource( 2 )
-cell_size = Vector2( 64, 64 )
-cell_quadrant_size = 16
-cell_custom_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
-cell_half_offset = 2
-cell_tile_origin = 0
-cell_y_sort = false
-cell_clip_uv = false
-collision_use_kinematic = false
-collision_friction = 1.0
-collision_bounce = 0.0
-collision_layer = 1
-collision_mask = 1
-occluder_light_mask = 1
 format = 1
-tile_data = PoolIntArray(  )
 script = ExtResource( 3 )
-_sections_unfolded = [ "Cell", "Collision" ]
 
-[node name="AudioPlayer" type="AudioStreamPlayer" parent="." index="1"]
+[node name="AudioPlayer" type="AudioStreamPlayer" parent="."]
 
-stream = null
-volume_db = 0.0
-pitch_scale = 1.0
-autoplay = false
-mix_target = 0
-bus = "Master"
-
-[node name="Camera2D" type="Camera2D" parent="." index="2"]
-
+[node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 512.621, 299.8 )
-anchor_mode = 1
-rotating = false
 current = true
 zoom = Vector2( 1.5, 1.5 )
-limit_left = -10000000
-limit_top = -10000000
-limit_right = 10000000
-limit_bottom = 10000000
-limit_smoothed = false
 drag_margin_h_enabled = false
 drag_margin_v_enabled = false
-smoothing_enabled = false
-smoothing_speed = 5.0
-offset_v = 0.0
-offset_h = 0.0
 drag_margin_left = 1.0
 drag_margin_top = 1.0
 drag_margin_right = 1.0
 drag_margin_bottom = 1.0
-editor_draw_screen = true
-editor_draw_limits = false
-editor_draw_drag_margin = false
 script = ExtResource( 4 )
-_sections_unfolded = [ "Drag Margin", "Editor", "Limit", "Offset", "Smoothing" ]
 
-[node name="GUI" parent="Camera2D" index="0" instance=ExtResource( 5 )]
-
+[node name="GUI" parent="Camera2D" instance=ExtResource( 5 )]
 

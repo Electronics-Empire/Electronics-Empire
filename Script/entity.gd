@@ -22,8 +22,17 @@ var orientation
 var damage
 var owner_id
 
+var mouse_here
+
 signal add_ressource_signal
 signal build_signal
+signal set_target_signal
+
+func __reset_active__():
+	pass
+
+func __die__():
+	pass
 
 remote func ask_entity_sync():
 	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation, self.owner_id)
@@ -111,12 +120,21 @@ func _process(delta):
 	self.clock_bar.value = ((self.clock_time-self.clock.time_left)/self.clock_time)*100
 	pass
 
+#warning-ignore:unused_argument
+func _on_input_event(viewport, event, shape_idx):
+	if event is InputEventMouseButton:
+		if event.is_pressed():
+			if event.button_index == BUTTON_LEFT:
+				emit_signal("set_target_signal", self.interpreter)
+	pass
+
 func _ready():
 	self.orientation = DIRECTION.south
 	
 	self.clock = Timer.new()
 	self.clock.set_one_shot(true)
 	self.add_child(self.clock)
+	self.set_pickable(true)
 	
 	self.clock_bar = get_node("Clock_bar")
 	self.movement = get_node("Movement")
@@ -124,6 +142,8 @@ func _ready():
 	self.sprite = get_node("AnimatedSprite")
 	self.ray_cast = get_node("Collision_checker")
 	self.health_bar = get_node("Health_bar")
+	
+	self.connect("input_event", self, "_on_input_event")
 	
 	self.ray_cast.cast_to = Vector2(0,globals.tileSize.y)
 	

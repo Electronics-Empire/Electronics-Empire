@@ -6,6 +6,7 @@ var mouvement = Vector2(0,0)
 onready var ctrl_global = get_node("/root/ctrl_global")
 
 
+#warning-ignore:unused_argument
 func _physics_process(delta):
 	if(self.current):
 		mouvement = Vector2(0,0)
