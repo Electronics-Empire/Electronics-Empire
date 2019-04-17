@@ -1,6 +1,7 @@
 extends LineEdit
 
 var ctrl_global
+var mouse_here = true
 
 # class member variables go here, for example:
 # var a = 2
@@ -23,4 +24,18 @@ func focus_entered():
 
 func focus_exited():
 	self.ctrl_global.bool_text_select = false
+	pass
+
+func mouse_entered():
+	mouse_here = true
+	pass
+
+func mouse_exited():
+	mouse_here = false
+	pass
+
+func _input(event):
+	if event is InputEventMouseButton:
+		if not mouse_here:
+			self.release_focus()
 	pass

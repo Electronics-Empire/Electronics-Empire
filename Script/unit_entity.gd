@@ -9,10 +9,10 @@ var id
 signal unit_dead_signal
 
 remote func ask_entity_sync():
-	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation, self.owner_id, self.code_pos, self.code )
+	rpc("unit_entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation, self.owner_id, self.code_pos, self.code )
 	pass
 
-remote func entity_sync(animation, frame, pos, health, orientation, owner_id, code_pos, code):
+remote func unit_entity_sync(animation, frame, pos, health, orientation, owner_id, code_pos, code):
 	self.sprite.animation = animation
 	self.sprite.frame = frame
 	self.position = pos

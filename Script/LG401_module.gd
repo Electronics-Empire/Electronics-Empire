@@ -30,7 +30,7 @@ sync func send_line(text):
 func _ready():
 	._ready()
 	
-	self.clock_time = 10
+	self.clock_time = 4
 	self.max_health = 100
 	self.damage = 50
 	self.entity_name = "LG401"

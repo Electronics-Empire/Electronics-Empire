@@ -97,6 +97,7 @@ func variant(operand):
 	if(operand.type == BASE_type.INTEGER):
 		eat(BASE_type.INTEGER)
 	else:
+		operand.value = self.registers[operand.value]
 		eat(BASE_type.REGISTER)
 
 # function for instruction with form INST REG/INT REG/INT REG
