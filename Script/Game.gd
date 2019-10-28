@@ -1,7 +1,6 @@
 extends Node
 
 var execute_button
-var world
 var globals
 var alert_dialog
 var network_info
@@ -23,18 +22,6 @@ func __generate_object__():
 
 # generate carbon ressources
 func __generate_carbon__():
-	var carbon_num = 5
-	while(carbon_num > 0):
-		var random_x = randi()%int(world.get_used_rect().size.x)
-		var random_y = randi()%int(world.get_used_rect().size.y)
-		
-		if((world.get_cell(random_x, random_y) == world.grass or world.get_cell(random_x, random_y) == world.dirt) and object_pos.find(Vector2(random_x, random_y)) == -1):
-			var new_carbon = self.carbon_obj.instance()
-			add_child(new_carbon)
-			new_carbon.set_position(Vector2((random_x*globals.tileSize.x) + globals.tileSize.x/2, (random_y*globals.tileSize.y) + globals.tileSize.y/2))
-			object_pos.append(Vector2(random_x, random_y))
-			object_array.append(new_carbon)
-			carbon_num -= 1
 	pass
 
 # generate the client player
@@ -46,16 +33,7 @@ remote func generate_player(id):
 	var random_y_location
 	var init_pos
 	
-	random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
-	random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
-	init_pos = Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2)
-	
-	while( (self.world.get_cell((init_pos.x/self.globals.tileSize.x), (init_pos.y/self.globals.tileSize.y)) == self.world.water
-		  or self.world.get_cell((init_pos.x/self.globals.tileSize.x), (init_pos.y/self.globals.tileSize.y)) == self.world.border)
-		  and object_pos.find(Vector2(random_x_location, random_y_location)) == -1 ):
-		random_x_location = (randi()%int(self.world.get_used_rect().size.x-1))*self.globals.tileSize.x
-		random_y_location = (randi()%int(self.world.get_used_rect().size.y-1))*self.globals.tileSize.y
-		init_pos = Vector2(random_x_location + self.globals.tileSize.x/2, random_y_location + self.globals.tileSize.y/2)
+	init_pos = Vector2((3 * self.globals.tileSize.x) + self.globals.tileSize.x/2, (3 * self.globals.tileSize.x) + self.globals.tileSize.y/2)
 	
 	player.generate_lg401(init_pos)
 	player.set_name(str(id))
@@ -146,7 +124,7 @@ sync func continue_all():
 
 # call in Multiplayer.gd, generate the world
 func generate_world():
-	self.world.__generate_world__()
+	self.generation_finished()
 	pass
 
 # signal in WorldGen.gd, when the world generation is finish we generate all
@@ -200,7 +178,6 @@ func server_disconnected():
 func _ready():
 	
 	self.execute_button = get_node("Camera2D/GUI/PanelGUI/GUI_execute_button")
-	self.world = get_node("World")
 	self.globals = get_node("/root/globals")
 	self.network_info = get_node("/root/network_info")
 	self.alert_dialog = get_node("Camera2D/GUI/PanelGUI/AlertDialog")
@@ -211,7 +188,6 @@ func _ready():
 	self.carbon_counter = get_node("Camera2D/GUI/PanelGUI/Carbon_counter")
 	
 	self.execute_button.connect("button_pressed_signal", self, "execute_button")
-	self.world.connect("Generation_finished_signal", self, "generation_finished")
 	get_tree().connect("network_peer_connected", self, "new_peer")
 	get_tree().connect("network_peer_disconnected", self, "peer_left")
 	get_tree().connect("connected_to_server", self, "player_connection")

@@ -29,13 +29,19 @@ remote func ask_entity_sync():
 	rpc("entity_sync", self.sprite.animation, self.sprite.frame, self.position, self.health_bar.value, self.orientation, self.owner_id)
 	pass
 
-remote func entity_sync(animation, frame, pos, health, orientation, owner_id):
+remote func entity_sync(animation, frame, pos, health, orientation, owner_id, code_pos, code):
 	self.sprite.animation = animation
 	self.sprite.frame = frame
 	self.position = pos
 	self.health_bar.value = health
 	self.orientation = orientation
 	self.owner_id = owner_id
+	pass
+
+func __reset_active__():
+	pass
+
+func __die__():
 	pass
 
 func walk(count):
