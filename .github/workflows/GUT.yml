@@ -1,9 +1,9 @@
-name: CI
+name: GUT
 
 on: [push]
 
 jobs:
-  build:
+  units-tests:
 
     runs-on: ubuntu-latest
 
